@@ -1,3 +1,5 @@
+import os
+from getpass import getuser
 import numpy as np
 import torch
 import torch.nn as nn
@@ -167,6 +169,15 @@ class MDM(nn.Module):
             # adding the timestep embed
             xseq = torch.cat((emb, x), axis=0)  # [seqlen+1, bs, d]
             xseq = self.sequence_pos_encoder(xseq)  # [seqlen+1, bs, d]
+            
+            # save latent vector
+            index = 0
+            save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_{index}'
+            while os.path.exists(save_dir):
+                index += 1
+                save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_{index}'
+            np.save(save_dir, xseq.detach().cpu().numpy())
+
             output = self.seqTransEncoder(xseq)[1:]  # , src_key_padding_mask=~maskseq)  # [seqlen, bs, d]
 
         elif self.arch == 'trans_dec':
