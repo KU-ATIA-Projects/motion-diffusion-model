@@ -155,6 +155,15 @@ class MDM(nn.Module):
         if 'action' in self.cond_mode:
             action_emb = self.embed_action(y['action'])
             emb += self.mask_cond(action_emb, force_mask=force_mask)
+        
+        # save latent vector
+        index = 0
+        save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_{index}.npy'
+        while os.path.exists(save_dir):
+            index += 1
+            save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_{index}.npy'
+        np.save(save_dir, emb.detach().cpu().numpy())
+        print(f'latent vector saved to {save_dir}')
 
         if self.arch == 'gru':
             x_reshaped = x.reshape(bs, njoints*nfeats, 1, nframes)
@@ -169,14 +178,6 @@ class MDM(nn.Module):
             # adding the timestep embed
             xseq = torch.cat((emb, x), axis=0)  # [seqlen+1, bs, d]
             xseq = self.sequence_pos_encoder(xseq)  # [seqlen+1, bs, d]
-            
-            # save latent vector
-            index = 0
-            save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_{index}'
-            while os.path.exists(save_dir):
-                index += 1
-                save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_{index}'
-            np.save(save_dir, xseq.detach().cpu().numpy())
 
             output = self.seqTransEncoder(xseq)[1:]  # , src_key_padding_mask=~maskseq)  # [seqlen, bs, d]
 

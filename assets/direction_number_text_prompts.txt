@@ -1,12 +1,4 @@
 A person jumps forward.
-A person jumps forward twice.
-A person jumps forward three times.
 A person jumps backward.
-A person jumps backward twice.
-A person jumps backward three times.
 A person jumps to the left.
-A person jumps to the left twice.
-A person jumps to the left three times.
 A person jumps to the right.
-A person jumps to the right twice.
-A person jumps to the right three times.
