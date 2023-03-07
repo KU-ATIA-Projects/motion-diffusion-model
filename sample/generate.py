@@ -85,6 +85,13 @@ def main():
     model.to(dist_util.dev())
     model.eval()  # disable random masking
 
+    # import pickle
+
+    # with open('mdm_model.pkl', 'wb') as f:
+    #     pickle.dump(model, f)
+
+    # raise Exception('stop')
+
     if is_using_data:
         iterator = iter(data)
         _, model_kwargs = next(iterator)
@@ -114,6 +121,12 @@ def main():
 
         sample_fn = diffusion.p_sample_loop
 
+        noise = None
+        if args.noise != '':
+            noise = torch.load(args.noise)
+            # repeat noise for each sample
+            noise = noise.repeat(args.num_samples, 1, 1, 1)
+
         sample = sample_fn(
             model,
             (args.batch_size, model.njoints, model.nfeats, n_frames),
@@ -123,7 +136,7 @@ def main():
             init_image=None,
             progress=True,
             dump_steps=None,
-            noise=None,
+            noise=noise,
             const_noise=False,
         )
 

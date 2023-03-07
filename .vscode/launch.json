@@ -14,11 +14,11 @@
                 "--model_path",
                 "./save/humanml_trans_enc_512/model000200000.pt",
                 "--input_text",
-                "./assets/direction_number_text_prompts.txt"
+                "./assets/naive_text_prompts.txt",
                 // "--text_prompt",
                 // "The man turns right.",
-                // "--num_repetitions",
-                // "10"
+                "--num_repetitions",
+                "30"
             ],
             "justMyCode": true
         },

@@ -201,6 +201,11 @@ def add_evaluation_options(parser):
                        help="For classifier-free sampling - specifies the s parameter, as defined in the paper.")
 
 
+def add_custom_options(parser):
+    group = parser.add_argument_group('custom')
+    group.add_argument("--noise", default='', type=str,
+                       help="Path to a npy file that lists initial noise for each sample. The shape should be (263, 1, 120). If multiple samples are provided, the noise will be repeated.")
+
 def get_cond_mode(args):
     if args.unconstrained:
         cond_mode = 'no_cond'
@@ -227,6 +232,7 @@ def generate_args():
     add_base_options(parser)
     add_sampling_options(parser)
     add_generate_options(parser)
+    add_custom_options(parser)
     args = parse_and_load_from_model(parser)
     cond_mode = get_cond_mode(args)
 

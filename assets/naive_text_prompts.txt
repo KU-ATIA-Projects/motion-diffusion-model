@@ -1,0 +1,4 @@
+A person jumps forward.
+A person walks to the right.
+A person sits down.
+A person climbs up a ladder.

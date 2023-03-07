@@ -1,0 +1,64 @@
+A person runs forward.
+A person runs backward.
+A person runs to the left.
+A person runs to the right.
+A person walks forward.
+A person walks backward.
+A person walks to the left.
+A person walks to the right.
+A person crawls forward.
+A person crawls backward.
+A person crawls to the left.
+A person crawls to the right.
+A person skips forward.
+A person skips backward.
+A person skips to the left.
+A person skips to the right.
+A person sprints forward.
+A person sprints backward.
+A person sprints to the left.
+A person sprints to the right.
+A person jogs forward.
+A person jogs backward.
+A person jogs to the left.
+A person jogs to the right.
+A person steps forward.
+A person steps backward.
+A person steps to the left.
+A person steps to the right.
+A person lunges forward.
+A person lunges backward.
+A person lunges to the left.
+A person lunges to the right.
+A person tiptoes forward.
+A person tiptoes backward.
+A person tiptoes to the left.
+A person tiptoes to the right.
+A person hops forward.
+A person hops backward.
+A person hops to the left.
+A person hops to the right.
+A person slides forward.
+A person slides backward.
+A person slides to the left.
+A person slides to the right.
+A person glides forward.
+A person glides backward.
+A person glides to the left.
+A person glides to the right.
+A person skates forward.
+A person skates backward.
+A person skates to the left.
+A person skates to the right.
+A person surfs forward.
+A person surfs backward.
+A person surfs to the left.
+A person surfs to the right.
+A person dives forward.
+A person dives backward.
+A person dives to the left.
+A person dives to the right.
+A person flips forward.
+A person flips backward.
+A person flips to the left.
+A person flips to the right.

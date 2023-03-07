@@ -137,3 +137,5 @@ glove/
 *.tar
 playground*
 latent_vec/
+*.bak
+mdm_model.pkl

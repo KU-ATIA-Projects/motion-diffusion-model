@@ -1,4 +1,0 @@
-A person jumps forward.
-A person jumps backward.
-A person jumps to the left.
-A person jumps to the right.
