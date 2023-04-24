@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import clip
 from model.rotation2xyz import Rotation2xyz
-
+from attention import Prompt2PromptTransformerEncoderLayer
 
 
 class MDM(nn.Module):
@@ -56,7 +56,12 @@ class MDM(nn.Module):
 
         if self.arch == 'trans_enc':
             print("TRANS_ENC init")
-            seqTransEncoderLayer = nn.TransformerEncoderLayer(d_model=self.latent_dim,
+            # seqTransEncoderLayer = nn.TransformerEncoderLayer(d_model=self.latent_dim,
+            #                                                   nhead=self.num_heads,
+            #                                                   dim_feedforward=self.ff_size,
+            #                                                   dropout=self.dropout,
+            #                                                   activation=self.activation)
+            seqTransEncoderLayer = Prompt2PromptTransformerEncoderLayer(d_model=self.latent_dim,
                                                               nhead=self.num_heads,
                                                               dim_feedforward=self.ff_size,
                                                               dropout=self.dropout,
@@ -170,15 +175,15 @@ class MDM(nn.Module):
             xseq = torch.cat((emb, x), axis=0)  # [seqlen+1, bs, d]
             xseq = self.sequence_pos_encoder(xseq)  # [seqlen+1, bs, d]
 
-            if timesteps[0] == 999 or timesteps[0] % 50 == 0:
-                # save latent vector
-                index = 0
-                save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_{timesteps[0]}_{index}.npy'
-                while os.path.exists(save_dir):
-                    index += 1
-                    save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_{timesteps[0]}_{index}.npy'
-                np.save(save_dir, xseq.detach().cpu().numpy())
-                print(f'latent vector saved to {save_dir}')
+            # if timesteps[0] == 999 or timesteps[0] % 50 == 0:
+            #     # save latent vector
+            #     index = 0
+            #     save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_{timesteps[0]}_{index}.npy'
+            #     while os.path.exists(save_dir):
+            #         index += 1
+            #         save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_{timesteps[0]}_{index}.npy'
+            #     np.save(save_dir, xseq.detach().cpu().numpy())
+            #     print(f'latent vector saved to {save_dir}')
 
             output = self.seqTransEncoder(xseq)[1:]  # , src_key_padding_mask=~maskseq)  # [seqlen, bs, d]
 
