@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.nn.modules.activation import MultiheadAttention
 from torch.nn import TransformerEncoderLayer
-import functional as F
+from . import functional as F
 
 class Prompt2PromptMultiheadAttention(MultiheadAttention):
     def __init__(self, embed_dim, num_heads, dropout=0, bias=True, add_bias_kv=False, add_zero_attn=False, kdim=None, vdim=None):

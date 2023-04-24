@@ -13,12 +13,12 @@
             "args": [
                 "--model_path",
                 "./save/humanml_trans_enc_512/model000200000.pt",
-                "--input_text",
-                "./assets/naive_text_prompts.txt",
-                // "--text_prompt",
-                // "The man turns right.",
-                "--num_repetitions",
-                "30"
+                // "--input_text",
+                // "./assets/naive_text_prompts.txt",
+                "--text_prompt",
+                "The man flies.",
+                // "--num_repetitions",
+                // "30"
             ],
             "justMyCode": true
         },

@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import clip
 from model.rotation2xyz import Rotation2xyz
-from attention import Prompt2PromptTransformerEncoderLayer
+from .attention import Prompt2PromptTransformerEncoderLayer
 
 
 class MDM(nn.Module):

@@ -7,348 +7,348 @@ from torch._C import _infer_size, _add_docstr
 from torch.nn import _reduction as _Reduction
 from torch.nn.modules import utils
 from torch.nn.modules.utils import _single, _pair, _triple, _list_with_default
-from torch import grad  # noqa: F401
+# from torch import grad  # noqa: F401
 from torch import _VF
 from torch._jit_internal import boolean_dispatch, List, Optional, _overload, Tuple
 from torch.overrides import has_torch_function, handle_torch_function
 
 Tensor = torch.Tensor
 
-conv1d = _add_docstr(torch.conv1d, r"""
-conv1d(input, weight, bias=None, stride=1, padding=0, dilation=1, groups=1) -> Tensor
+# conv1d = _add_docstr(torch.conv1d, r"""
+# conv1d(input, weight, bias=None, stride=1, padding=0, dilation=1, groups=1) -> Tensor
 
-Applies a 1D convolution over an input signal composed of several input
-planes.
+# Applies a 1D convolution over an input signal composed of several input
+# planes.
 
-This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
+# This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
 
-See :class:`~torch.nn.Conv1d` for details and output shape.
+# See :class:`~torch.nn.Conv1d` for details and output shape.
 
-Note:
-    In some circumstances when using the CUDA backend with CuDNN, this operator
-    may select a nondeterministic algorithm to increase performance. If this is
-    undesirable, you can try to make the operation deterministic (potentially at
-    a performance cost) by setting ``torch.backends.cudnn.deterministic =
-    True``.
-    Please see the notes on :doc:`/notes/randomness` for background.
+# Note:
+#     In some circumstances when using the CUDA backend with CuDNN, this operator
+#     may select a nondeterministic algorithm to increase performance. If this is
+#     undesirable, you can try to make the operation deterministic (potentially at
+#     a performance cost) by setting ``torch.backends.cudnn.deterministic =
+#     True``.
+#     Please see the notes on :doc:`/notes/randomness` for background.
 
-Args:
-    input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iW)`
-    weight: filters of shape :math:`(\text{out\_channels} , \frac{\text{in\_channels}}{\text{groups}} , kW)`
-    bias: optional bias of shape :math:`(\text{out\_channels})`. Default: ``None``
-    stride: the stride of the convolving kernel. Can be a single number or
-      a one-element tuple `(sW,)`. Default: 1
-    padding: implicit paddings on both sides of the input. Can be a
-      single number or a one-element tuple `(padW,)`. Default: 0
-    dilation: the spacing between kernel elements. Can be a single number or
-      a one-element tuple `(dW,)`. Default: 1
-    groups: split input into groups, :math:`\text{in\_channels}` should be divisible by
-      the number of groups. Default: 1
+# Args:
+#     input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iW)`
+#     weight: filters of shape :math:`(\text{out\_channels} , \frac{\text{in\_channels}}{\text{groups}} , kW)`
+#     bias: optional bias of shape :math:`(\text{out\_channels})`. Default: ``None``
+#     stride: the stride of the convolving kernel. Can be a single number or
+#       a one-element tuple `(sW,)`. Default: 1
+#     padding: implicit paddings on both sides of the input. Can be a
+#       single number or a one-element tuple `(padW,)`. Default: 0
+#     dilation: the spacing between kernel elements. Can be a single number or
+#       a one-element tuple `(dW,)`. Default: 1
+#     groups: split input into groups, :math:`\text{in\_channels}` should be divisible by
+#       the number of groups. Default: 1
 
-Examples::
+# Examples::
 
-    >>> filters = torch.randn(33, 16, 3)
-    >>> inputs = torch.randn(20, 16, 50)
-    >>> F.conv1d(inputs, filters)
-""")
+#     >>> filters = torch.randn(33, 16, 3)
+#     >>> inputs = torch.randn(20, 16, 50)
+#     >>> F.conv1d(inputs, filters)
+# """)
 
-conv2d = _add_docstr(torch.conv2d, r"""
-conv2d(input, weight, bias=None, stride=1, padding=0, dilation=1, groups=1) -> Tensor
+# conv2d = _add_docstr(torch.conv2d, r"""
+# conv2d(input, weight, bias=None, stride=1, padding=0, dilation=1, groups=1) -> Tensor
 
-Applies a 2D convolution over an input image composed of several input
-planes.
+# Applies a 2D convolution over an input image composed of several input
+# planes.
 
-This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
+# This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
 
-See :class:`~torch.nn.Conv2d` for details and output shape.
+# See :class:`~torch.nn.Conv2d` for details and output shape.
 
-Note:
-    In some circumstances when using the CUDA backend with CuDNN, this operator
-    may select a nondeterministic algorithm to increase performance. If this is
-    undesirable, you can try to make the operation deterministic (potentially at
-    a performance cost) by setting ``torch.backends.cudnn.deterministic =
-    True``.
-    Please see the notes on :doc:`/notes/randomness` for background.
+# Note:
+#     In some circumstances when using the CUDA backend with CuDNN, this operator
+#     may select a nondeterministic algorithm to increase performance. If this is
+#     undesirable, you can try to make the operation deterministic (potentially at
+#     a performance cost) by setting ``torch.backends.cudnn.deterministic =
+#     True``.
+#     Please see the notes on :doc:`/notes/randomness` for background.
 
 
-Args:
-    input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iH , iW)`
-    weight: filters of shape :math:`(\text{out\_channels} , \frac{\text{in\_channels}}{\text{groups}} , kH , kW)`
-    bias: optional bias tensor of shape :math:`(\text{out\_channels})`. Default: ``None``
-    stride: the stride of the convolving kernel. Can be a single number or a
-      tuple `(sH, sW)`. Default: 1
-    padding: implicit paddings on both sides of the input. Can be a
-      single number or a tuple `(padH, padW)`. Default: 0
-    dilation: the spacing between kernel elements. Can be a single number or
-      a tuple `(dH, dW)`. Default: 1
-    groups: split input into groups, :math:`\text{in\_channels}` should be divisible by the
-      number of groups. Default: 1
+# Args:
+#     input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iH , iW)`
+#     weight: filters of shape :math:`(\text{out\_channels} , \frac{\text{in\_channels}}{\text{groups}} , kH , kW)`
+#     bias: optional bias tensor of shape :math:`(\text{out\_channels})`. Default: ``None``
+#     stride: the stride of the convolving kernel. Can be a single number or a
+#       tuple `(sH, sW)`. Default: 1
+#     padding: implicit paddings on both sides of the input. Can be a
+#       single number or a tuple `(padH, padW)`. Default: 0
+#     dilation: the spacing between kernel elements. Can be a single number or
+#       a tuple `(dH, dW)`. Default: 1
+#     groups: split input into groups, :math:`\text{in\_channels}` should be divisible by the
+#       number of groups. Default: 1
 
-Examples::
+# Examples::
 
-    >>> # With square kernels and equal stride
-    >>> filters = torch.randn(8,4,3,3)
-    >>> inputs = torch.randn(1,4,5,5)
-    >>> F.conv2d(inputs, filters, padding=1)
-""")  # noqa: E501
+#     >>> # With square kernels and equal stride
+#     >>> filters = torch.randn(8,4,3,3)
+#     >>> inputs = torch.randn(1,4,5,5)
+#     >>> F.conv2d(inputs, filters, padding=1)
+# """)  # noqa: E501
 
-conv3d = _add_docstr(torch.conv3d, r"""
-conv3d(input, weight, bias=None, stride=1, padding=0, dilation=1, groups=1) -> Tensor
+# conv3d = _add_docstr(torch.conv3d, r"""
+# conv3d(input, weight, bias=None, stride=1, padding=0, dilation=1, groups=1) -> Tensor
 
-Applies a 3D convolution over an input image composed of several input
-planes.
+# Applies a 3D convolution over an input image composed of several input
+# planes.
 
-This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
+# This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
 
-See :class:`~torch.nn.Conv3d` for details and output shape.
+# See :class:`~torch.nn.Conv3d` for details and output shape.
 
-Note:
-    In some circumstances when using the CUDA backend with CuDNN, this operator
-    may select a nondeterministic algorithm to increase performance. If this is
-    undesirable, you can try to make the operation deterministic (potentially at
-    a performance cost) by setting ``torch.backends.cudnn.deterministic =
-    True``.
-    Please see the notes on :doc:`/notes/randomness` for background.
+# Note:
+#     In some circumstances when using the CUDA backend with CuDNN, this operator
+#     may select a nondeterministic algorithm to increase performance. If this is
+#     undesirable, you can try to make the operation deterministic (potentially at
+#     a performance cost) by setting ``torch.backends.cudnn.deterministic =
+#     True``.
+#     Please see the notes on :doc:`/notes/randomness` for background.
 
-Args:
-    input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iT , iH , iW)`
-    weight: filters of shape :math:`(\text{out\_channels} , \frac{\text{in\_channels}}{\text{groups}} , kT , kH , kW)`
-    bias: optional bias tensor of shape :math:`(\text{out\_channels})`. Default: None
-    stride: the stride of the convolving kernel. Can be a single number or a
-      tuple `(sT, sH, sW)`. Default: 1
-    padding: implicit paddings on both sides of the input. Can be a
-      single number or a tuple `(padT, padH, padW)`. Default: 0
-    dilation: the spacing between kernel elements. Can be a single number or
-      a tuple `(dT, dH, dW)`. Default: 1
-    groups: split input into groups, :math:`\text{in\_channels}` should be divisible by
-      the number of groups. Default: 1
+# Args:
+#     input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iT , iH , iW)`
+#     weight: filters of shape :math:`(\text{out\_channels} , \frac{\text{in\_channels}}{\text{groups}} , kT , kH , kW)`
+#     bias: optional bias tensor of shape :math:`(\text{out\_channels})`. Default: None
+#     stride: the stride of the convolving kernel. Can be a single number or a
+#       tuple `(sT, sH, sW)`. Default: 1
+#     padding: implicit paddings on both sides of the input. Can be a
+#       single number or a tuple `(padT, padH, padW)`. Default: 0
+#     dilation: the spacing between kernel elements. Can be a single number or
+#       a tuple `(dT, dH, dW)`. Default: 1
+#     groups: split input into groups, :math:`\text{in\_channels}` should be divisible by
+#       the number of groups. Default: 1
 
-Examples::
+# Examples::
 
-    >>> filters = torch.randn(33, 16, 3, 3, 3)
-    >>> inputs = torch.randn(20, 16, 50, 10, 20)
-    >>> F.conv3d(inputs, filters)
-""")  # noqa: E501
+#     >>> filters = torch.randn(33, 16, 3, 3, 3)
+#     >>> inputs = torch.randn(20, 16, 50, 10, 20)
+#     >>> F.conv3d(inputs, filters)
+# """)  # noqa: E501
 
-conv_transpose1d = _add_docstr(torch.conv_transpose1d, r"""
-conv_transpose1d(input, weight, bias=None, stride=1, padding=0, output_padding=0, groups=1, dilation=1) -> Tensor
+# conv_transpose1d = _add_docstr(torch.conv_transpose1d, r"""
+# conv_transpose1d(input, weight, bias=None, stride=1, padding=0, output_padding=0, groups=1, dilation=1) -> Tensor
 
-Applies a 1D transposed convolution operator over an input signal
-composed of several input planes, sometimes also called "deconvolution".
+# Applies a 1D transposed convolution operator over an input signal
+# composed of several input planes, sometimes also called "deconvolution".
 
-This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
+# This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
 
-See :class:`~torch.nn.ConvTranspose1d` for details and output shape.
+# See :class:`~torch.nn.ConvTranspose1d` for details and output shape.
 
-Note:
-    In some circumstances when using the CUDA backend with CuDNN, this operator
-    may select a nondeterministic algorithm to increase performance. If this is
-    undesirable, you can try to make the operation deterministic (potentially at
-    a performance cost) by setting ``torch.backends.cudnn.deterministic =
-    True``.
-    Please see the notes on :doc:`/notes/randomness` for background.
+# Note:
+#     In some circumstances when using the CUDA backend with CuDNN, this operator
+#     may select a nondeterministic algorithm to increase performance. If this is
+#     undesirable, you can try to make the operation deterministic (potentially at
+#     a performance cost) by setting ``torch.backends.cudnn.deterministic =
+#     True``.
+#     Please see the notes on :doc:`/notes/randomness` for background.
 
-Args:
-    input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iW)`
-    weight: filters of shape :math:`(\text{in\_channels} , \frac{\text{out\_channels}}{\text{groups}} , kW)`
-    bias: optional bias of shape :math:`(\text{out\_channels})`. Default: None
-    stride: the stride of the convolving kernel. Can be a single number or a
-      tuple ``(sW,)``. Default: 1
-    padding: ``dilation * (kernel_size - 1) - padding`` zero-padding will be added to both
-      sides of each dimension in the input. Can be a single number or a tuple
-      ``(padW,)``. Default: 0
-    output_padding: additional size added to one side of each dimension in the
-      output shape. Can be a single number or a tuple ``(out_padW)``. Default: 0
-    groups: split input into groups, :math:`\text{in\_channels}` should be divisible by the
-      number of groups. Default: 1
-    dilation: the spacing between kernel elements. Can be a single number or
-      a tuple ``(dW,)``. Default: 1
+# Args:
+#     input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iW)`
+#     weight: filters of shape :math:`(\text{in\_channels} , \frac{\text{out\_channels}}{\text{groups}} , kW)`
+#     bias: optional bias of shape :math:`(\text{out\_channels})`. Default: None
+#     stride: the stride of the convolving kernel. Can be a single number or a
+#       tuple ``(sW,)``. Default: 1
+#     padding: ``dilation * (kernel_size - 1) - padding`` zero-padding will be added to both
+#       sides of each dimension in the input. Can be a single number or a tuple
+#       ``(padW,)``. Default: 0
+#     output_padding: additional size added to one side of each dimension in the
+#       output shape. Can be a single number or a tuple ``(out_padW)``. Default: 0
+#     groups: split input into groups, :math:`\text{in\_channels}` should be divisible by the
+#       number of groups. Default: 1
+#     dilation: the spacing between kernel elements. Can be a single number or
+#       a tuple ``(dW,)``. Default: 1
 
-Examples::
+# Examples::
 
-    >>> inputs = torch.randn(20, 16, 50)
-    >>> weights = torch.randn(16, 33, 5)
-    >>> F.conv_transpose1d(inputs, weights)
-""")
+#     >>> inputs = torch.randn(20, 16, 50)
+#     >>> weights = torch.randn(16, 33, 5)
+#     >>> F.conv_transpose1d(inputs, weights)
+# """)
 
-conv_transpose2d = _add_docstr(torch.conv_transpose2d, r"""
-conv_transpose2d(input, weight, bias=None, stride=1, padding=0, output_padding=0, groups=1, dilation=1) -> Tensor
+# conv_transpose2d = _add_docstr(torch.conv_transpose2d, r"""
+# conv_transpose2d(input, weight, bias=None, stride=1, padding=0, output_padding=0, groups=1, dilation=1) -> Tensor
 
-Applies a 2D transposed convolution operator over an input image
-composed of several input planes, sometimes also called "deconvolution".
+# Applies a 2D transposed convolution operator over an input image
+# composed of several input planes, sometimes also called "deconvolution".
 
-This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
+# This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
 
-See :class:`~torch.nn.ConvTranspose2d` for details and output shape.
+# See :class:`~torch.nn.ConvTranspose2d` for details and output shape.
 
-Note:
-    In some circumstances when using the CUDA backend with CuDNN, this operator
-    may select a nondeterministic algorithm to increase performance. If this is
-    undesirable, you can try to make the operation deterministic (potentially at
-    a performance cost) by setting ``torch.backends.cudnn.deterministic =
-    True``.
-    Please see the notes on :doc:`/notes/randomness` for background.
+# Note:
+#     In some circumstances when using the CUDA backend with CuDNN, this operator
+#     may select a nondeterministic algorithm to increase performance. If this is
+#     undesirable, you can try to make the operation deterministic (potentially at
+#     a performance cost) by setting ``torch.backends.cudnn.deterministic =
+#     True``.
+#     Please see the notes on :doc:`/notes/randomness` for background.
 
-Args:
-    input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iH , iW)`
-    weight: filters of shape :math:`(\text{in\_channels} , \frac{\text{out\_channels}}{\text{groups}} , kH , kW)`
-    bias: optional bias of shape :math:`(\text{out\_channels})`. Default: None
-    stride: the stride of the convolving kernel. Can be a single number or a
-      tuple ``(sH, sW)``. Default: 1
-    padding: ``dilation * (kernel_size - 1) - padding`` zero-padding will be added to both
-      sides of each dimension in the input. Can be a single number or a tuple
-      ``(padH, padW)``. Default: 0
-    output_padding: additional size added to one side of each dimension in the
-      output shape. Can be a single number or a tuple ``(out_padH, out_padW)``.
-      Default: 0
-    groups: split input into groups, :math:`\text{in\_channels}` should be divisible by the
-      number of groups. Default: 1
-    dilation: the spacing between kernel elements. Can be a single number or
-      a tuple ``(dH, dW)``. Default: 1
+# Args:
+#     input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iH , iW)`
+#     weight: filters of shape :math:`(\text{in\_channels} , \frac{\text{out\_channels}}{\text{groups}} , kH , kW)`
+#     bias: optional bias of shape :math:`(\text{out\_channels})`. Default: None
+#     stride: the stride of the convolving kernel. Can be a single number or a
+#       tuple ``(sH, sW)``. Default: 1
+#     padding: ``dilation * (kernel_size - 1) - padding`` zero-padding will be added to both
+#       sides of each dimension in the input. Can be a single number or a tuple
+#       ``(padH, padW)``. Default: 0
+#     output_padding: additional size added to one side of each dimension in the
+#       output shape. Can be a single number or a tuple ``(out_padH, out_padW)``.
+#       Default: 0
+#     groups: split input into groups, :math:`\text{in\_channels}` should be divisible by the
+#       number of groups. Default: 1
+#     dilation: the spacing between kernel elements. Can be a single number or
+#       a tuple ``(dH, dW)``. Default: 1
 
-Examples::
+# Examples::
 
-    >>> # With square kernels and equal stride
-    >>> inputs = torch.randn(1, 4, 5, 5)
-    >>> weights = torch.randn(4, 8, 3, 3)
-    >>> F.conv_transpose2d(inputs, weights, padding=1)
-""")  # noqa: E501
+#     >>> # With square kernels and equal stride
+#     >>> inputs = torch.randn(1, 4, 5, 5)
+#     >>> weights = torch.randn(4, 8, 3, 3)
+#     >>> F.conv_transpose2d(inputs, weights, padding=1)
+# """)  # noqa: E501
 
-conv_transpose3d = _add_docstr(torch.conv_transpose3d, r"""
-conv_transpose3d(input, weight, bias=None, stride=1, padding=0, output_padding=0, groups=1, dilation=1) -> Tensor
+# conv_transpose3d = _add_docstr(torch.conv_transpose3d, r"""
+# conv_transpose3d(input, weight, bias=None, stride=1, padding=0, output_padding=0, groups=1, dilation=1) -> Tensor
 
-Applies a 3D transposed convolution operator over an input image
-composed of several input planes, sometimes also called "deconvolution"
+# Applies a 3D transposed convolution operator over an input image
+# composed of several input planes, sometimes also called "deconvolution"
 
-This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
+# This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
 
-See :class:`~torch.nn.ConvTranspose3d` for details and output shape.
+# See :class:`~torch.nn.ConvTranspose3d` for details and output shape.
 
-Note:
-    In some circumstances when using the CUDA backend with CuDNN, this operator
-    may select a nondeterministic algorithm to increase performance. If this is
-    undesirable, you can try to make the operation deterministic (potentially at
-    a performance cost) by setting ``torch.backends.cudnn.deterministic =
-    True``.
-    Please see the notes on :doc:`/notes/randomness` for background.
+# Note:
+#     In some circumstances when using the CUDA backend with CuDNN, this operator
+#     may select a nondeterministic algorithm to increase performance. If this is
+#     undesirable, you can try to make the operation deterministic (potentially at
+#     a performance cost) by setting ``torch.backends.cudnn.deterministic =
+#     True``.
+#     Please see the notes on :doc:`/notes/randomness` for background.
 
-Args:
-    input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iT , iH , iW)`
-    weight: filters of shape :math:`(\text{in\_channels} , \frac{\text{out\_channels}}{\text{groups}} , kT , kH , kW)`
-    bias: optional bias of shape :math:`(\text{out\_channels})`. Default: None
-    stride: the stride of the convolving kernel. Can be a single number or a
-      tuple ``(sT, sH, sW)``. Default: 1
-    padding: ``dilation * (kernel_size - 1) - padding`` zero-padding will be added to both
-      sides of each dimension in the input. Can be a single number or a tuple
-      ``(padT, padH, padW)``. Default: 0
-    output_padding: additional size added to one side of each dimension in the
-      output shape. Can be a single number or a tuple
-      ``(out_padT, out_padH, out_padW)``. Default: 0
-    groups: split input into groups, :math:`\text{in\_channels}` should be divisible by the
-      number of groups. Default: 1
-    dilation: the spacing between kernel elements. Can be a single number or
-      a tuple `(dT, dH, dW)`. Default: 1
+# Args:
+#     input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iT , iH , iW)`
+#     weight: filters of shape :math:`(\text{in\_channels} , \frac{\text{out\_channels}}{\text{groups}} , kT , kH , kW)`
+#     bias: optional bias of shape :math:`(\text{out\_channels})`. Default: None
+#     stride: the stride of the convolving kernel. Can be a single number or a
+#       tuple ``(sT, sH, sW)``. Default: 1
+#     padding: ``dilation * (kernel_size - 1) - padding`` zero-padding will be added to both
+#       sides of each dimension in the input. Can be a single number or a tuple
+#       ``(padT, padH, padW)``. Default: 0
+#     output_padding: additional size added to one side of each dimension in the
+#       output shape. Can be a single number or a tuple
+#       ``(out_padT, out_padH, out_padW)``. Default: 0
+#     groups: split input into groups, :math:`\text{in\_channels}` should be divisible by the
+#       number of groups. Default: 1
+#     dilation: the spacing between kernel elements. Can be a single number or
+#       a tuple `(dT, dH, dW)`. Default: 1
 
-Examples::
+# Examples::
 
-    >>> inputs = torch.randn(20, 16, 50, 10, 20)
-    >>> weights = torch.randn(16, 33, 3, 3, 3)
-    >>> F.conv_transpose3d(inputs, weights)
-""")  # noqa: E501
+#     >>> inputs = torch.randn(20, 16, 50, 10, 20)
+#     >>> weights = torch.randn(16, 33, 3, 3, 3)
+#     >>> F.conv_transpose3d(inputs, weights)
+# """)  # noqa: E501
 
-conv_tbc = _add_docstr(torch.conv_tbc, r"""
-Applies a 1-dimensional sequence convolution over an input sequence.
-Input and output dimensions are (Time, Batch, Channels) - hence TBC.
+# conv_tbc = _add_docstr(torch.conv_tbc, r"""
+# Applies a 1-dimensional sequence convolution over an input sequence.
+# Input and output dimensions are (Time, Batch, Channels) - hence TBC.
 
-Args:
-    input: input tensor of shape :math:`(\text{sequence length} \times batch \times \text{in\_channels})`
-    weight: filter of shape (:math:`\text{kernel width} \times \text{in\_channels} \times \text{out\_channels}`)
-    bias: bias of shape (:math:`\text{out\_channels}`)
-    pad: number of timesteps to pad. Default: 0
-""")
+# Args:
+#     input: input tensor of shape :math:`(\text{sequence length} \times batch \times \text{in\_channels})`
+#     weight: filter of shape (:math:`\text{kernel width} \times \text{in\_channels} \times \text{out\_channels}`)
+#     bias: bias of shape (:math:`\text{out\_channels}`)
+#     pad: number of timesteps to pad. Default: 0
+# """)
 
 
 # Pooling
-avg_pool1d = _add_docstr(torch.avg_pool1d, r"""
-avg_pool1d(input, kernel_size, stride=None, padding=0, ceil_mode=False, count_include_pad=True) -> Tensor
+# avg_pool1d = _add_docstr(torch.avg_pool1d, r"""
+# avg_pool1d(input, kernel_size, stride=None, padding=0, ceil_mode=False, count_include_pad=True) -> Tensor
 
-Applies a 1D average pooling over an input signal composed of several
-input planes.
+# Applies a 1D average pooling over an input signal composed of several
+# input planes.
 
-See :class:`~torch.nn.AvgPool1d` for details and output shape.
+# See :class:`~torch.nn.AvgPool1d` for details and output shape.
 
-Args:
-    input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iW)`
-    kernel_size: the size of the window. Can be a single number or a
-      tuple `(kW,)`
-    stride: the stride of the window. Can be a single number or a tuple
-      `(sW,)`. Default: :attr:`kernel_size`
-    padding: implicit zero paddings on both sides of the input. Can be a
-      single number or a tuple `(padW,)`. Default: 0
-    ceil_mode: when True, will use `ceil` instead of `floor` to compute the
-        output shape. Default: ``False``
-    count_include_pad: when True, will include the zero-padding in the
-        averaging calculation. Default: ``True``
+# Args:
+#     input: input tensor of shape :math:`(\text{minibatch} , \text{in\_channels} , iW)`
+#     kernel_size: the size of the window. Can be a single number or a
+#       tuple `(kW,)`
+#     stride: the stride of the window. Can be a single number or a tuple
+#       `(sW,)`. Default: :attr:`kernel_size`
+#     padding: implicit zero paddings on both sides of the input. Can be a
+#       single number or a tuple `(padW,)`. Default: 0
+#     ceil_mode: when True, will use `ceil` instead of `floor` to compute the
+#         output shape. Default: ``False``
+#     count_include_pad: when True, will include the zero-padding in the
+#         averaging calculation. Default: ``True``
 
-Examples::
+# Examples::
 
-    >>> # pool of square window of size=3, stride=2
-    >>> input = torch.tensor([[[1, 2, 3, 4, 5, 6, 7]]], dtype=torch.float32)
-    >>> F.avg_pool1d(input, kernel_size=3, stride=2)
-    tensor([[[ 2.,  4.,  6.]]])
+#     >>> # pool of square window of size=3, stride=2
+#     >>> input = torch.tensor([[[1, 2, 3, 4, 5, 6, 7]]], dtype=torch.float32)
+#     >>> F.avg_pool1d(input, kernel_size=3, stride=2)
+#     tensor([[[ 2.,  4.,  6.]]])
 
-""")
+# """)
 
 
-avg_pool2d = _add_docstr(torch._C._nn.avg_pool2d, r"""
-avg_pool2d(input, kernel_size, stride=None, padding=0, ceil_mode=False, count_include_pad=True, divisor_override=None) -> Tensor
+# avg_pool2d = _add_docstr(torch._C._nn.avg_pool2d, r"""
+# avg_pool2d(input, kernel_size, stride=None, padding=0, ceil_mode=False, count_include_pad=True, divisor_override=None) -> Tensor
 
-Applies 2D average-pooling operation in :math:`kH \times kW` regions by step size
-:math:`sH \times sW` steps. The number of output features is equal to the number of
-input planes.
+# Applies 2D average-pooling operation in :math:`kH \times kW` regions by step size
+# :math:`sH \times sW` steps. The number of output features is equal to the number of
+# input planes.
 
-See :class:`~torch.nn.AvgPool2d` for details and output shape.
+# See :class:`~torch.nn.AvgPool2d` for details and output shape.
 
-Args:
-    input: input tensor :math:`(\text{minibatch} , \text{in\_channels} , iH , iW)`
-    kernel_size: size of the pooling region. Can be a single number or a
-      tuple `(kH, kW)`
-    stride: stride of the pooling operation. Can be a single number or a
-      tuple `(sH, sW)`. Default: :attr:`kernel_size`
-    padding: implicit zero paddings on both sides of the input. Can be a
-      single number or a tuple `(padH, padW)`. Default: 0
-    ceil_mode: when True, will use `ceil` instead of `floor` in the formula
-        to compute the output shape. Default: ``False``
-    count_include_pad: when True, will include the zero-padding in the
-        averaging calculation. Default: ``True``
-    divisor_override: if specified, it will be used as divisor, otherwise
-         size of the pooling region will be used. Default: None
-""")
+# Args:
+#     input: input tensor :math:`(\text{minibatch} , \text{in\_channels} , iH , iW)`
+#     kernel_size: size of the pooling region. Can be a single number or a
+#       tuple `(kH, kW)`
+#     stride: stride of the pooling operation. Can be a single number or a
+#       tuple `(sH, sW)`. Default: :attr:`kernel_size`
+#     padding: implicit zero paddings on both sides of the input. Can be a
+#       single number or a tuple `(padH, padW)`. Default: 0
+#     ceil_mode: when True, will use `ceil` instead of `floor` in the formula
+#         to compute the output shape. Default: ``False``
+#     count_include_pad: when True, will include the zero-padding in the
+#         averaging calculation. Default: ``True``
+#     divisor_override: if specified, it will be used as divisor, otherwise
+#          size of the pooling region will be used. Default: None
+# """)
 
-avg_pool3d = _add_docstr(torch._C._nn.avg_pool3d, r"""
-avg_pool3d(input, kernel_size, stride=None, padding=0, ceil_mode=False, count_include_pad=True, divisor_override=None) -> Tensor
+# avg_pool3d = _add_docstr(torch._C._nn.avg_pool3d, r"""
+# avg_pool3d(input, kernel_size, stride=None, padding=0, ceil_mode=False, count_include_pad=True, divisor_override=None) -> Tensor
 
-Applies 3D average-pooling operation in :math:`kT \times kH \times kW` regions by step
-size :math:`sT \times sH \times sW` steps. The number of output features is equal to
-:math:`\lfloor\frac{\text{input planes}}{sT}\rfloor`.
+# Applies 3D average-pooling operation in :math:`kT \times kH \times kW` regions by step
+# size :math:`sT \times sH \times sW` steps. The number of output features is equal to
+# :math:`\lfloor\frac{\text{input planes}}{sT}\rfloor`.
 
-See :class:`~torch.nn.AvgPool3d` for details and output shape.
+# See :class:`~torch.nn.AvgPool3d` for details and output shape.
 
-Args:
-    input: input tensor :math:`(\text{minibatch} , \text{in\_channels} , iT \times iH , iW)`
-    kernel_size: size of the pooling region. Can be a single number or a
-      tuple `(kT, kH, kW)`
-    stride: stride of the pooling operation. Can be a single number or a
-      tuple `(sT, sH, sW)`. Default: :attr:`kernel_size`
-    padding: implicit zero paddings on both sides of the input. Can be a
-      single number or a tuple `(padT, padH, padW)`, Default: 0
-    ceil_mode: when True, will use `ceil` instead of `floor` in the formula
-        to compute the output shape
-    count_include_pad: when True, will include the zero-padding in the
-        averaging calculation
-    divisor_override: if specified, it will be used as divisor, otherwise
-        size of the pooling region will be used. Default: None
-""")
+# Args:
+#     input: input tensor :math:`(\text{minibatch} , \text{in\_channels} , iT \times iH , iW)`
+#     kernel_size: size of the pooling region. Can be a single number or a
+#       tuple `(kT, kH, kW)`
+#     stride: stride of the pooling operation. Can be a single number or a
+#       tuple `(sT, sH, sW)`. Default: :attr:`kernel_size`
+#     padding: implicit zero paddings on both sides of the input. Can be a
+#       single number or a tuple `(padT, padH, padW)`, Default: 0
+#     ceil_mode: when True, will use `ceil` instead of `floor` in the formula
+#         to compute the output shape
+#     count_include_pad: when True, will include the zero-padding in the
+#         averaging calculation
+#     divisor_override: if specified, it will be used as divisor, otherwise
+#         size of the pooling region will be used. Default: None
+# """)
 
 
 def fractional_max_pool2d_with_indices(input, kernel_size, output_size=None,
@@ -902,17 +902,17 @@ adaptive_max_pool3d = boolean_dispatch(
     func_name='adaptive_max_pool3d')
 
 
-adaptive_avg_pool1d = _add_docstr(torch.adaptive_avg_pool1d, r"""
-adaptive_avg_pool1d(input, output_size) -> Tensor
+# adaptive_avg_pool1d = _add_docstr(torch.adaptive_avg_pool1d, r"""
+# adaptive_avg_pool1d(input, output_size) -> Tensor
 
-Applies a 1D adaptive average pooling over an input signal composed of
-several input planes.
+# Applies a 1D adaptive average pooling over an input signal composed of
+# several input planes.
 
-See :class:`~torch.nn.AdaptiveAvgPool1d` for details and output shape.
+# See :class:`~torch.nn.AdaptiveAvgPool1d` for details and output shape.
 
-Args:
-    output_size: the target output size (single integer)
-""")
+# Args:
+#     output_size: the target output size (single integer)
+# """)
 
 
 def adaptive_avg_pool2d(input, output_size):
@@ -1113,11 +1113,11 @@ def _threshold(input, threshold, value, inplace=False):
 # function needed for __torch_function__ support
 threshold = _threshold
 
-threshold_ = _add_docstr(_VF.threshold_, r"""
-threshold_(input, threshold, value) -> Tensor
+# threshold_ = _add_docstr(_VF.threshold_, r"""
+# threshold_(input, threshold, value) -> Tensor
 
-In-place version of :func:`~threshold`.
-""")
+# In-place version of :func:`~threshold`.
+# """)
 
 
 def relu(input: Tensor, inplace: bool = False) -> Tensor:
@@ -1136,11 +1136,11 @@ def relu(input: Tensor, inplace: bool = False) -> Tensor:
     return result
 
 
-relu_ = _add_docstr(torch.relu_, r"""
-relu_(input) -> Tensor
+# relu_ = _add_docstr(torch.relu_, r"""
+# relu_(input) -> Tensor
 
-In-place version of :func:`~relu`.
-""")
+# In-place version of :func:`~relu`.
+# """)
 
 
 def glu(input: Tensor, dim: int = -1) -> Tensor:
@@ -1188,11 +1188,11 @@ def hardtanh(input: Tensor, min_val: float = -1., max_val: float = 1., inplace: 
     return result
 
 
-hardtanh_ = _add_docstr(torch._C._nn.hardtanh_, r"""
-hardtanh_(input, min_val=-1., max_val=1.) -> Tensor
+# hardtanh_ = _add_docstr(torch._C._nn.hardtanh_, r"""
+# hardtanh_(input, min_val=-1., max_val=1.) -> Tensor
 
-In-place version of :func:`~hardtanh`.
-""")
+# In-place version of :func:`~hardtanh`.
+# """)
 
 
 def relu6(input, inplace=False):
@@ -1227,11 +1227,11 @@ def elu(input, alpha=1., inplace=False):
     return result
 
 
-elu_ = _add_docstr(torch._C._nn.elu_, r"""
-elu_(input, alpha=1.) -> Tensor
+# elu_ = _add_docstr(torch._C._nn.elu_, r"""
+# elu_(input, alpha=1.) -> Tensor
 
-In-place version of :func:`~elu`.
-""")
+# In-place version of :func:`~elu`.
+# """)
 
 
 def selu(input, inplace=False):
@@ -1255,11 +1255,11 @@ def selu(input, inplace=False):
     return result
 
 
-selu_ = _add_docstr(torch.selu_, r"""
-selu_(input) -> Tensor
+# selu_ = _add_docstr(torch.selu_, r"""
+# selu_(input) -> Tensor
 
-In-place version of :func:`~selu`.
-""")
+# In-place version of :func:`~selu`.
+# """)
 
 
 def celu(input, alpha=1., inplace=False):
@@ -1281,11 +1281,11 @@ def celu(input, alpha=1., inplace=False):
         result = torch.celu(input, alpha)
     return result
 
-celu_ = _add_docstr(torch.celu_, r"""
-celu_(input, alpha=1.) -> Tensor
+# celu_ = _add_docstr(torch.celu_, r"""
+# celu_(input, alpha=1.) -> Tensor
 
-In-place version of :func:`~celu`.
-""")
+# In-place version of :func:`~celu`.
+# """)
 
 
 def leaky_relu(input: Tensor, negative_slope: float = 0.01, inplace: bool = False) -> Tensor:
@@ -1309,11 +1309,11 @@ def leaky_relu(input: Tensor, negative_slope: float = 0.01, inplace: bool = Fals
     return result
 
 
-leaky_relu_ = _add_docstr(torch._C._nn.leaky_relu_, r"""
-leaky_relu_(input, negative_slope=0.01) -> Tensor
+# leaky_relu_ = _add_docstr(torch._C._nn.leaky_relu_, r"""
+# leaky_relu_(input, negative_slope=0.01) -> Tensor
 
-In-place version of :func:`~leaky_relu`.
-""")
+# In-place version of :func:`~leaky_relu`.
+# """)
 
 
 def prelu(input, weight):
@@ -1352,19 +1352,19 @@ def rrelu(input, lower=1. / 8, upper=1. / 3, training=False, inplace=False):
     return result
 
 
-rrelu_ = _add_docstr(torch.rrelu_, r"""
-rrelu_(input, lower=1./8, upper=1./3, training=False) -> Tensor
+# rrelu_ = _add_docstr(torch.rrelu_, r"""
+# rrelu_(input, lower=1./8, upper=1./3, training=False) -> Tensor
 
-In-place version of :func:`~rrelu`.
-""")
+# In-place version of :func:`~rrelu`.
+# """)
 
-logsigmoid = _add_docstr(torch._C._nn.log_sigmoid, r"""
-logsigmoid(input) -> Tensor
+# logsigmoid = _add_docstr(torch._C._nn.log_sigmoid, r"""
+# logsigmoid(input) -> Tensor
 
-Applies element-wise :math:`\text{LogSigmoid}(x_i) = \log \left(\frac{1}{1 + \exp(-x_i)}\right)`
+# Applies element-wise :math:`\text{LogSigmoid}(x_i) = \log \left(\frac{1}{1 + \exp(-x_i)}\right)`
 
-See :class:`~torch.nn.LogSigmoid` for more details.
-""")
+# See :class:`~torch.nn.LogSigmoid` for more details.
+# """)
 
 def gelu(input):
     r"""gelu(input) -> Tensor
@@ -1423,16 +1423,16 @@ def softsign(input):
     return input / (input.abs() + 1)
 
 
-softplus = _add_docstr(torch._C._nn.softplus, r"""
-softplus(input, beta=1, threshold=20) -> Tensor
+# softplus = _add_docstr(torch._C._nn.softplus, r"""
+# softplus(input, beta=1, threshold=20) -> Tensor
 
-Applies element-wise, the function :math:`\text{Softplus}(x) = \frac{1}{\beta} * \log(1 + \exp(\beta * x))`.
+# Applies element-wise, the function :math:`\text{Softplus}(x) = \frac{1}{\beta} * \log(1 + \exp(\beta * x))`.
 
-For numerical stability the implementation reverts to the linear function
-when :math:`input \times \beta > threshold`.
+# For numerical stability the implementation reverts to the linear function
+# when :math:`input \times \beta > threshold`.
 
-See :class:`~torch.nn.Softplus` for more details.
-""")
+# See :class:`~torch.nn.Softplus` for more details.
+# """)
 
 
 def _get_softmax_dim(name, ndim, stacklevel):
@@ -1607,13 +1607,13 @@ def log_softmax(input, dim=None, _stacklevel=3, dtype=None):
     return ret
 
 
-softshrink = _add_docstr(torch._C._nn.softshrink, r"""
-softshrink(input, lambd=0.5) -> Tensor
+# softshrink = _add_docstr(torch._C._nn.softshrink, r"""
+# softshrink(input, lambd=0.5) -> Tensor
 
-Applies the soft shrinkage function elementwise
+# Applies the soft shrinkage function elementwise
 
-See :class:`~torch.nn.Softshrink` for more details.
-""")
+# See :class:`~torch.nn.Softshrink` for more details.
+# """)
 
 
 def tanh(input):
@@ -2823,60 +2823,60 @@ def multi_margin_loss(input, target, p=1, margin=1., weight=None, size_average=N
     return torch._C._nn.multi_margin_loss(input, target, p, margin, weight, reduction_enum)
 
 
-pixel_shuffle = _add_docstr(torch.pixel_shuffle, r"""
-Rearranges elements in a tensor of shape :math:`(*, C \times r^2, H, W)` to a
-tensor of shape :math:`(*, C, H \times r, W \times r)`.
+# pixel_shuffle = _add_docstr(torch.pixel_shuffle, r"""
+# Rearranges elements in a tensor of shape :math:`(*, C \times r^2, H, W)` to a
+# tensor of shape :math:`(*, C, H \times r, W \times r)`.
 
-See :class:`~torch.nn.PixelShuffle` for details.
+# See :class:`~torch.nn.PixelShuffle` for details.
 
-Args:
-    input (Tensor): the input tensor
-    upscale_factor (int): factor to increase spatial resolution by
+# Args:
+#     input (Tensor): the input tensor
+#     upscale_factor (int): factor to increase spatial resolution by
 
-Examples::
+# Examples::
 
-    >>> input = torch.randn(1, 9, 4, 4)
-    >>> output = torch.nn.functional.pixel_shuffle(input, 3)
-    >>> print(output.size())
-    torch.Size([1, 1, 12, 12])
-""")
+#     >>> input = torch.randn(1, 9, 4, 4)
+#     >>> output = torch.nn.functional.pixel_shuffle(input, 3)
+#     >>> print(output.size())
+#     torch.Size([1, 1, 12, 12])
+# """)
 
-channel_shuffle = _add_docstr(torch.channel_shuffle, r"""
-Divide the channels in a tensor of shape :math:`(*, C , H, W)`
-into g groups and rearrange them as :math:`(*, C \frac g, g, H, W)`,
-while keeping the original tensor shape.
+# channel_shuffle = _add_docstr(torch.channel_shuffle, r"""
+# Divide the channels in a tensor of shape :math:`(*, C , H, W)`
+# into g groups and rearrange them as :math:`(*, C \frac g, g, H, W)`,
+# while keeping the original tensor shape.
 
-See :class:`~torch.nn.ChannelShuffle` for details.
+# See :class:`~torch.nn.ChannelShuffle` for details.
 
-Args:
-    input (Tensor): the input tensor
-    groups (int): number of groups to divide channels in and rearrange.
+# Args:
+#     input (Tensor): the input tensor
+#     groups (int): number of groups to divide channels in and rearrange.
 
-Examples::
+# Examples::
 
-    >>> input = torch.randn(1, 4, 2, 2)
-    >>> print(input)
-    [[[[1, 2],
-       [3, 4]],
-      [[5, 6],
-       [7, 8]],
-      [[9, 10],
-       [11, 12]],
-      [[13, 14],
-       [15, 16]],
-     ]]
-    >>> output = torch.nn.functional.channel_shuffle(input, 2)
-    >>> print(output)
-    [[[[1, 2],
-       [3, 4]],
-      [[9, 10],
-       [11, 12]],
-      [[5, 6],
-       [7, 8]],
-      [[13, 14],
-       [15, 16]],
-     ]]
-""")
+#     >>> input = torch.randn(1, 4, 2, 2)
+#     >>> print(input)
+#     [[[[1, 2],
+#        [3, 4]],
+#       [[5, 6],
+#        [7, 8]],
+#       [[9, 10],
+#        [11, 12]],
+#       [[13, 14],
+#        [15, 16]],
+#      ]]
+#     >>> output = torch.nn.functional.channel_shuffle(input, 2)
+#     >>> print(output)
+#     [[[[1, 2],
+#        [3, 4]],
+#       [[9, 10],
+#        [11, 12]],
+#       [[5, 6],
+#        [7, 8]],
+#       [[13, 14],
+#        [15, 16]],
+#      ]]
+# """)
 
 @_overload  # noqa: F811
 def upsample(input, size=None, scale_factor=None, mode='nearest', align_corners=None):  # noqa: F811
@@ -3603,103 +3603,103 @@ def pairwise_distance(x1, x2, p=2., eps=1e-6, keepdim=False):
     return torch.pairwise_distance(x1, x2, p, eps, keepdim)
 
 
-pdist = _add_docstr(torch.pdist, r"""
-pdist(input, p=2) -> Tensor
+# pdist = _add_docstr(torch.pdist, r"""
+# pdist(input, p=2) -> Tensor
 
-Computes the p-norm distance between every pair of row vectors in the input.
-This is identical to the upper triangular portion, excluding the diagonal, of
-`torch.norm(input[:, None] - input, dim=2, p=p)`. This function will be faster
-if the rows are contiguous.
+# Computes the p-norm distance between every pair of row vectors in the input.
+# This is identical to the upper triangular portion, excluding the diagonal, of
+# `torch.norm(input[:, None] - input, dim=2, p=p)`. This function will be faster
+# if the rows are contiguous.
 
-If input has shape :math:`N \times M` then the output will have shape
-:math:`\frac{1}{2} N (N - 1)`.
+# If input has shape :math:`N \times M` then the output will have shape
+# :math:`\frac{1}{2} N (N - 1)`.
 
-This function is equivalent to `scipy.spatial.distance.pdist(input,
-'minkowski', p=p)` if :math:`p \in (0, \infty)`. When :math:`p = 0` it is
-equivalent to `scipy.spatial.distance.pdist(input, 'hamming') * M`.
-When :math:`p = \infty`, the closest scipy function is
-`scipy.spatial.distance.pdist(xn, lambda x, y: np.abs(x - y).max())`.
+# This function is equivalent to `scipy.spatial.distance.pdist(input,
+# 'minkowski', p=p)` if :math:`p \in (0, \infty)`. When :math:`p = 0` it is
+# equivalent to `scipy.spatial.distance.pdist(input, 'hamming') * M`.
+# When :math:`p = \infty`, the closest scipy function is
+# `scipy.spatial.distance.pdist(xn, lambda x, y: np.abs(x - y).max())`.
 
-Args:
-    input: input tensor of shape :math:`N \times M`.
-    p: p value for the p-norm distance to calculate between each vector pair
-        :math:`\in [0, \infty]`.
-""")
-
-
-cosine_similarity = _add_docstr(torch.cosine_similarity, r"""
-cosine_similarity(x1, x2, dim=1, eps=1e-8) -> Tensor
-
-Returns cosine similarity between x1 and x2, computed along dim.
-
-.. math ::
-    \text{similarity} = \dfrac{x_1 \cdot x_2}{\max(\Vert x_1 \Vert _2 \cdot \Vert x_2 \Vert _2, \epsilon)}
-
-Args:
-    x1 (Tensor): First input.
-    x2 (Tensor): Second input (of size matching x1).
-    dim (int, optional): Dimension of vectors. Default: 1
-    eps (float, optional): Small value to avoid division by zero.
-        Default: 1e-8
-
-Shape:
-    - Input: :math:`(\ast_1, D, \ast_2)` where D is at position `dim`.
-    - Output: :math:`(\ast_1, \ast_2)` where 1 is at position `dim`.
-
-Example::
-
-    >>> input1 = torch.randn(100, 128)
-    >>> input2 = torch.randn(100, 128)
-    >>> output = F.cosine_similarity(input1, input2)
-    >>> print(output)
-""")
+# Args:
+#     input: input tensor of shape :math:`N \times M`.
+#     p: p value for the p-norm distance to calculate between each vector pair
+#         :math:`\in [0, \infty]`.
+# """)
 
 
-one_hot = _add_docstr(torch._C._nn.one_hot, r"""
-one_hot(tensor, num_classes=-1) -> LongTensor
+# cosine_similarity = _add_docstr(torch.cosine_similarity, r"""
+# cosine_similarity(x1, x2, dim=1, eps=1e-8) -> Tensor
 
-Takes LongTensor with index values of shape ``(*)`` and returns a tensor
-of shape ``(*, num_classes)`` that have zeros everywhere except where the
-index of last dimension matches the corresponding value of the input tensor,
-in which case it will be 1.
+# Returns cosine similarity between x1 and x2, computed along dim.
 
-See also `One-hot on Wikipedia`_ .
+# .. math ::
+#     \text{similarity} = \dfrac{x_1 \cdot x_2}{\max(\Vert x_1 \Vert _2 \cdot \Vert x_2 \Vert _2, \epsilon)}
 
-.. _One-hot on Wikipedia:
-    https://en.wikipedia.org/wiki/One-hot
+# Args:
+#     x1 (Tensor): First input.
+#     x2 (Tensor): Second input (of size matching x1).
+#     dim (int, optional): Dimension of vectors. Default: 1
+#     eps (float, optional): Small value to avoid division by zero.
+#         Default: 1e-8
 
-Arguments:
-    tensor (LongTensor): class values of any shape.
-    num_classes (int):  Total number of classes. If set to -1, the number
-        of classes will be inferred as one greater than the largest class
-        value in the input tensor.
+# Shape:
+#     - Input: :math:`(\ast_1, D, \ast_2)` where D is at position `dim`.
+#     - Output: :math:`(\ast_1, \ast_2)` where 1 is at position `dim`.
 
-Returns:
-    LongTensor that has one more dimension with 1 values at the
-    index of last dimension indicated by the input, and 0 everywhere
-    else.
+# Example::
 
-Examples:
-    >>> F.one_hot(torch.arange(0, 5) % 3)
-    tensor([[1, 0, 0],
-            [0, 1, 0],
-            [0, 0, 1],
-            [1, 0, 0],
-            [0, 1, 0]])
-    >>> F.one_hot(torch.arange(0, 5) % 3, num_classes=5)
-    tensor([[1, 0, 0, 0, 0],
-            [0, 1, 0, 0, 0],
-            [0, 0, 1, 0, 0],
-            [1, 0, 0, 0, 0],
-            [0, 1, 0, 0, 0]])
-    >>> F.one_hot(torch.arange(0, 6).view(3,2) % 3)
-    tensor([[[1, 0, 0],
-             [0, 1, 0]],
-            [[0, 0, 1],
-             [1, 0, 0]],
-            [[0, 1, 0],
-             [0, 0, 1]]])
-""")
+#     >>> input1 = torch.randn(100, 128)
+#     >>> input2 = torch.randn(100, 128)
+#     >>> output = F.cosine_similarity(input1, input2)
+#     >>> print(output)
+# """)
+
+
+# one_hot = _add_docstr(torch._C._nn.one_hot, r"""
+# one_hot(tensor, num_classes=-1) -> LongTensor
+
+# Takes LongTensor with index values of shape ``(*)`` and returns a tensor
+# of shape ``(*, num_classes)`` that have zeros everywhere except where the
+# index of last dimension matches the corresponding value of the input tensor,
+# in which case it will be 1.
+
+# See also `One-hot on Wikipedia`_ .
+
+# .. _One-hot on Wikipedia:
+#     https://en.wikipedia.org/wiki/One-hot
+
+# Arguments:
+#     tensor (LongTensor): class values of any shape.
+#     num_classes (int):  Total number of classes. If set to -1, the number
+#         of classes will be inferred as one greater than the largest class
+#         value in the input tensor.
+
+# Returns:
+#     LongTensor that has one more dimension with 1 values at the
+#     index of last dimension indicated by the input, and 0 everywhere
+#     else.
+
+# Examples:
+#     >>> F.one_hot(torch.arange(0, 5) % 3)
+#     tensor([[1, 0, 0],
+#             [0, 1, 0],
+#             [0, 0, 1],
+#             [1, 0, 0],
+#             [0, 1, 0]])
+#     >>> F.one_hot(torch.arange(0, 5) % 3, num_classes=5)
+#     tensor([[1, 0, 0, 0, 0],
+#             [0, 1, 0, 0, 0],
+#             [0, 0, 1, 0, 0],
+#             [1, 0, 0, 0, 0],
+#             [0, 1, 0, 0, 0]])
+#     >>> F.one_hot(torch.arange(0, 6).view(3,2) % 3)
+#     tensor([[[1, 0, 0],
+#              [0, 1, 0]],
+#             [[0, 0, 1],
+#              [1, 0, 0]],
+#             [[0, 1, 0],
+#              [0, 0, 1]]])
+# """)
 
 
 def triplet_margin_loss(anchor, positive, negative, margin=1.0, p=2, eps=1e-6, swap=False, size_average=None,
@@ -4294,16 +4294,16 @@ def multi_head_attention_forward(query: Tensor,
     attn_output_weights = torch.bmm(q, k.transpose(1, 2))
     assert list(attn_output_weights.size()) == [bsz * num_heads, tgt_len, src_len]
 
-    if prompt_to_prompt:
-        attn_output_weights_ = attn_output_weights.chunk(4)
-        attn_output_weights = torch.cat([attn_output_weights_[0], attn_output_weights_[0], attn_output_weights_[2], attn_output_weights_[2]])
-
     if attn_mask is not None:
         if attn_mask.dtype == torch.bool:
             attn_output_weights.masked_fill_(attn_mask, float('-inf'))
         else:
             attn_output_weights += attn_mask
 
+    if prompt_to_prompt:
+        # ? Does it make sense to add prompt-to-prompt here?
+        sim = attn_output_weights.chunk(4)
+        attn_output_weights = torch.cat((sim[0], sim[0], sim[2], sim[2]))
 
     if key_padding_mask is not None:
         attn_output_weights = attn_output_weights.view(bsz, num_heads, tgt_len, src_len)
