@@ -139,3 +139,6 @@ playground*
 latent_vec/
 *.bak
 mdm_model.pkl
+archive/
+*.pdf
+scripts/
