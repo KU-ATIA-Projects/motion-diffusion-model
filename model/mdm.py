@@ -13,7 +13,7 @@ class MDM(nn.Module):
     def __init__(self, modeltype, njoints, nfeats, num_actions, translation, pose_rep, glob, glob_rot,
                  latent_dim=256, ff_size=1024, num_layers=8, num_heads=4, dropout=0.1,
                  ablation=None, activation="gelu", legacy=False, data_rep='rot6d', dataset='amass', clip_dim=512,
-                 arch='trans_enc', emb_trans_dec=False, clip_version=None, **kargs):
+                 arch='trans_enc', emb_trans_dec=False, clip_version=None, prompt2prompt_threshold=0.5, diffusion_steps=1000, **kargs):
         super().__init__()
 
         self.legacy = legacy
@@ -102,6 +102,9 @@ class MDM(nn.Module):
 
         self.rot2xyz = Rotation2xyz(device='cpu', dataset=self.dataset)
 
+        self.prompt2prompt_threshold = prompt2prompt_threshold
+        self.diffusion_steps = diffusion_steps
+
     def parameters_wo_clip(self):
         return [p for name, p in self.named_parameters() if not name.startswith('clip_model.')]
 
@@ -184,6 +187,9 @@ class MDM(nn.Module):
             #         save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_{timesteps[0]}_{index}.npy'
             #     np.save(save_dir, xseq.detach().cpu().numpy())
             #     print(f'latent vector saved to {save_dir}')
+            prompt_to_prompt = self.prompt2prompt_threshold > (self.diffusion_steps - timesteps[0]) / self.diffusion_steps
+            for layer in self.seqTransEncoder.layers:
+                layer.self_attn.prompt_to_prompt = prompt_to_prompt
 
             output = self.seqTransEncoder(xseq)[1:]  # , src_key_padding_mask=~maskseq)  # [seqlen, bs, d]
 

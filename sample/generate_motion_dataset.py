@@ -10,7 +10,7 @@ from utils.fixseed import fixseed
 import os
 import numpy as np
 import torch
-from utils.parser_util import generate_args
+from utils.parser_util import generate_motion_dataset_args
 from utils.model_util import create_model_and_diffusion, load_model_wo_clip
 from utils import dist_util
 from model.cfg_sampler import ClassifierFreeSampleModel
@@ -21,9 +21,11 @@ from data_loaders.humanml.utils.plot_script import plot_3d_motion
 import shutil
 from data_loaders.tensors import collate
 
+import json
+
 
 def main():
-    args = generate_args()
+    args = generate_motion_dataset_args()
     fixseed(args.seed)
     out_path = args.output_dir
     name = os.path.basename(os.path.dirname(args.model_path))
@@ -42,25 +44,35 @@ def main():
             out_path += '_' + os.path.basename(args.input_text).replace('.txt', '').replace(' ', '_').replace('.', '')
 
     # this block must be called BEFORE the dataset is loaded
-    if args.text_prompt != '':
-        texts = [args.text_prompt]
-        args.num_samples = 1
-    elif args.input_text != '':
-        assert os.path.exists(args.input_text)
-        with open(args.input_text, 'r') as fr:
-            texts = fr.readlines()
-        texts = [s.replace('\n', '') for s in texts]
-        args.num_samples = len(texts)
-    elif args.action_name:
-        action_text = [args.action_name]
-        args.num_samples = 1
-    elif args.action_file != '':
-        assert os.path.exists(args.action_file)
-        with open(args.action_file, 'r') as fr:
-            action_text = fr.readlines()
-        action_text = [s.replace('\n', '') for s in action_text]
-        args.num_samples = len(action_text)
+    # if args.text_prompt != '':
+    #     texts = [args.text_prompt]
+    #     args.num_samples = 1
+    # elif args.input_text != '':
+    #     assert os.path.exists(args.input_text)
+    #     with open(args.input_text, 'r') as fr:
+    #         texts = fr.readlines()
+    #     texts = [s.replace('\n', '') for s in texts]
+    #     args.num_samples = len(texts)
+    # elif args.action_name:
+    #     action_text = [args.action_name]
+    #     args.num_samples = 1
+    # elif args.action_file != '':
+    #     assert os.path.exists(args.action_file)
+    #     with open(args.action_file, 'r') as fr:
+    #         action_text = fr.readlines()
+    #     action_text = [s.replace('\n', '') for s in action_text]
+    #     args.num_samples = len(action_text)
     
+    assert args.input_text != '' and os.path.exists(args.input_text) and args.input_text.endswith('.jsonl')
+    with open(args.input_text, 'r') as fp:
+        # We assume that the input text file is a jsonl file with the following format:
+        # {"input": "The first sentence", "output": "The second sentence"}
+        # We make sure the odd lines are the input and the even lines are the output
+        # Therefore we don't need to change MDM code to support this format
+        prompts = [json.loads(line) for line in fp]
+        texts = [[prompt['input'], prompt['output']] for prompt in prompts]
+        texts = [item for sublist in texts for item in sublist]
+        args.num_samples = len(texts)
 
     assert args.num_samples <= args.batch_size, \
         f'Please either increase batch_size({args.batch_size}) or reduce num_samples({args.num_samples})'
@@ -104,9 +116,10 @@ def main():
             collate_args = [dict(arg, text=txt) for arg, txt in zip(collate_args, texts)]
         else:
             # a2m
-            action = data.dataset.action_name_to_action(action_text)
-            collate_args = [dict(arg, action=one_action, action_text=one_action_text) for
-                            arg, one_action, one_action_text in zip(collate_args, action, action_text)]
+            pass
+            # action = data.dataset.action_name_to_action(action_text)
+            # collate_args = [dict(arg, action=one_action, action_text=one_action_text) for
+                            # arg, one_action, one_action_text in zip(collate_args, action, action_text)]
         _, model_kwargs = collate(collate_args)
 
     all_motions = []
@@ -121,13 +134,6 @@ def main():
             model_kwargs['y']['scale'] = torch.ones(args.batch_size, device=dist_util.dev()) * args.guidance_param
 
         sample_fn = diffusion.p_sample_loop
-
-        noise = None
-        if args.noise != '':
-            noise = torch.load(args.noise)
-            # repeat noise for each sample
-            noise = noise.repeat(args.num_samples, 1, 1, 1)
-
         sample = sample_fn(
             model,
             (args.batch_size, model.njoints, model.nfeats, n_frames),
@@ -137,7 +143,7 @@ def main():
             init_image=None,
             progress=True,
             dump_steps=None,
-            noise=noise,
+            noise=None,
             const_noise=False,
         )
 

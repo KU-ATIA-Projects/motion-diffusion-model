@@ -4302,8 +4302,18 @@ def multi_head_attention_forward(query: Tensor,
 
     if prompt_to_prompt:
         # ? Does it make sense to add prompt-to-prompt here?
-        sim = attn_output_weights.chunk(4)
-        attn_output_weights = torch.cat((sim[0], sim[0], sim[2], sim[2]))
+        # MDM handles cond and uncond separately, so we have 2 instead of 4 here
+        # From Copilot: The shape of q is [bsz * num_heads, tgt_len, head_dim]
+        # From Debugger: The shape of q is [bsz * 4, 121, 128] here; the shape of attn_output_weights is [bsz * 4, 121, 121]
+
+        # ? Assume that every 4 rows represent a single prompt
+        bsz = attn_output_weights.shape[0] // 4
+        sim = list(attn_output_weights.chunk(bsz))
+        # ? Replace the even postions with the odd positions
+        for i in range(0, bsz, 2):
+            sim[i + 1] = sim[i]
+        # cat the list back to a tensor
+        attn_output_weights = torch.cat(sim, dim=0)
 
     if key_padding_mask is not None:
         attn_output_weights = attn_output_weights.view(bsz, num_heads, tgt_len, src_len)

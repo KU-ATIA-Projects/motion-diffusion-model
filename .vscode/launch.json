@@ -13,14 +13,34 @@
             "args": [
                 "--model_path",
                 "./save/humanml_trans_enc_512/model000200000.pt",
-                // "--input_text",
-                // "./assets/naive_text_prompts.txt",
-                "--text_prompt",
-                "The man flies.",
+                "--input_text",
+                "./assets/naive_text_prompts.txt",
+                // "--text_prompt",
+                // "The man flies.",
                 // "--num_repetitions",
                 // "30"
             ],
-            "justMyCode": true
+            "justMyCode": false
+        },
+        {
+            "name": "Python: Generate motion dataset",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/sample/generate_motion_dataset.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--model_path",
+                "./save/humanml_trans_enc_512/model000200000.pt",
+                "--input_text",
+                "/home/ctq566/instruct-pix2pix/assets/prompts.jsonl",
+                "--batch_size",
+                "256",
+                // "--text_prompt",
+                // "The man flies.",
+                // "--num_repetitions",
+                // "30"
+            ],
+            "justMyCode": false
         },
         {
             "name": "Python: Action to Motion",

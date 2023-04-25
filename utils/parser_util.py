@@ -171,6 +171,27 @@ def add_generate_options(parser):
                        help="An action name to be generated. If empty, will take text prompts from dataset.")
 
 
+def add_prompt2prompt_options(parser):
+    group = parser.add_argument_group('prompt2prompt')
+    group.add_argument(
+        "--partition",
+        type=int,
+        default=0,
+        help="Partition index.",
+    )
+    group.add_argument(
+        "--min-p2p",
+        type=float,
+        default=0.1,
+        help="Min prompt2prompt threshold (portion of denoising for which to fix self attention maps).",
+    )
+    group.add_argument(
+        "--max-p2p",
+        type=float,
+        default=0.9,
+        help="Max prompt2prompt threshold (portion of denoising for which to fix self attention maps).",
+    )
+
 def add_edit_options(parser):
     group = parser.add_argument_group('edit')
     group.add_argument("--edit_mode", default='in_between', choices=['in_between', 'upper_body'], type=str,
@@ -240,9 +261,24 @@ def generate_args():
         raise Exception('Arguments input_text and text_prompt should not be used for an action condition. Please use action_file or action_name.')
     elif (args.action_file or args.action_name) and cond_mode != 'action':
         raise Exception('Arguments action_file and action_name should not be used for a text condition. Please use input_text or text_prompt.')
-
     return args
 
+def generate_motion_dataset_args():
+    parser = ArgumentParser()
+    # args specified by the user: (all other will be loaded from the model)
+    add_base_options(parser)
+    add_sampling_options(parser)
+    add_generate_options(parser)
+    add_prompt2prompt_options(parser)
+    add_custom_options(parser)
+    args = parse_and_load_from_model(parser)
+    cond_mode = get_cond_mode(args)
+
+    if (args.input_text or args.text_prompt) and cond_mode != 'text':
+        raise Exception('Arguments input_text and text_prompt should not be used for an action condition. Please use action_file or action_name.')
+    elif (args.action_file or args.action_name) and cond_mode != 'action':
+        raise Exception('Arguments action_file and action_name should not be used for a text condition. Please use input_text or text_prompt.')
+    return args
 
 def edit_args():
     parser = ArgumentParser()
