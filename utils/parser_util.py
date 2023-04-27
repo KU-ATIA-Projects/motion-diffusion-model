@@ -26,12 +26,13 @@ def parse_and_load_from_model(parser):
         if a in model_args.keys():
             setattr(args, a, model_args[a])
 
-        elif 'cond_mode' in model_args: # backward compitability
+        elif 'cond_mode' in model_args:  # backward compitability
             unconstrained = (model_args['cond_mode'] == 'no_cond')
             setattr(args, 'unconstrained', unconstrained)
 
         else:
-            print('Warning: was not able to load [{}], using default value [{}] instead.'.format(a, args.__dict__[a]))
+            print('Warning: was not able to load [{}], using default value [{}] instead.'.format(
+                a, args.__dict__[a]))
 
     if args.cond_mask_prob == 0:
         args.guidance_param = 1
@@ -41,9 +42,11 @@ def parse_and_load_from_model(parser):
 def get_args_per_group_name(parser, args, group_name):
     for group in parser._action_groups:
         if group.title == group_name:
-            group_dict = {a.dest: getattr(args, a.dest, None) for a in group._group_actions}
+            group_dict = {a.dest: getattr(args, a.dest, None)
+                          for a in group._group_actions}
             return list(argparse.Namespace(**group_dict).__dict__.keys())
     return ValueError('group_name was not found.')
+
 
 def get_model_path_from_args():
     try:
@@ -57,10 +60,14 @@ def get_model_path_from_args():
 
 def add_base_options(parser):
     group = parser.add_argument_group('base')
-    group.add_argument("--cuda", default=True, type=bool, help="Use cuda device, otherwise use CPU.")
-    group.add_argument("--device", default=0, type=int, help="Device id to use.")
-    group.add_argument("--seed", default=10, type=int, help="For fixing random seed.")
-    group.add_argument("--batch_size", default=64, type=int, help="Batch size during training.")
+    group.add_argument("--cuda", default=True, type=bool,
+                       help="Use cuda device, otherwise use CPU.")
+    group.add_argument("--device", default=0, type=int,
+                       help="Device id to use.")
+    group.add_argument("--seed", default=10, type=int,
+                       help="For fixing random seed.")
+    group.add_argument("--batch_size", default=64, type=int,
+                       help="Batch size during training.")
 
 
 def add_diffusion_options(parser):
@@ -69,7 +76,8 @@ def add_diffusion_options(parser):
                        help="Noise schedule type")
     group.add_argument("--diffusion_steps", default=1000, type=int,
                        help="Number of diffusion steps (denoted T in the paper)")
-    group.add_argument("--sigma_small", default=True, type=bool, help="Use smaller sigma values.")
+    group.add_argument("--sigma_small", default=True,
+                       type=bool, help="Use smaller sigma values.")
 
 
 def add_model_options(parser):
@@ -87,13 +95,15 @@ def add_model_options(parser):
     group.add_argument("--cond_mask_prob", default=.1, type=float,
                        help="The probability of masking the condition during training."
                             " For classifier-free guidance learning.")
-    group.add_argument("--lambda_rcxyz", default=0.0, type=float, help="Joint positions loss.")
-    group.add_argument("--lambda_vel", default=0.0, type=float, help="Joint velocity loss.")
-    group.add_argument("--lambda_fc", default=0.0, type=float, help="Foot contact loss.")
+    group.add_argument("--lambda_rcxyz", default=0.0,
+                       type=float, help="Joint positions loss.")
+    group.add_argument("--lambda_vel", default=0.0,
+                       type=float, help="Joint velocity loss.")
+    group.add_argument("--lambda_fc", default=0.0,
+                       type=float, help="Foot contact loss.")
     group.add_argument("--unconstrained", action='store_true',
                        help="Model is trained unconditionally. That is, it is constrained by neither text nor action. "
                             "Currently tested on HumanAct12 only.")
-
 
 
 def add_data_options(parser):
@@ -113,8 +123,10 @@ def add_training_options(parser):
     group.add_argument("--train_platform_type", default='NoPlatform', choices=['NoPlatform', 'ClearmlPlatform', 'TensorboardPlatform'], type=str,
                        help="Choose platform to log results. NoPlatform means no logging.")
     group.add_argument("--lr", default=1e-4, type=float, help="Learning rate.")
-    group.add_argument("--weight_decay", default=0.0, type=float, help="Optimizer weight decay.")
-    group.add_argument("--lr_anneal_steps", default=0, type=int, help="Number of learning rate anneal steps.")
+    group.add_argument("--weight_decay", default=0.0,
+                       type=float, help="Optimizer weight decay.")
+    group.add_argument("--lr_anneal_steps", default=0, type=int,
+                       help="Number of learning rate anneal steps.")
     group.add_argument("--eval_batch_size", default=32, type=int,
                        help="Batch size during evaluation loop. Do not change this unless you know what you are doing. "
                             "T2m precision calculation is based on fixed batch size 32.")
@@ -173,24 +185,29 @@ def add_generate_options(parser):
 
 def add_prompt2prompt_options(parser):
     group = parser.add_argument_group('prompt2prompt')
-    group.add_argument(
-        "--partition",
-        type=int,
-        default=0,
-        help="Partition index.",
-    )
-    group.add_argument(
-        "--min-p2p",
-        type=float,
-        default=0.1,
-        help="Min prompt2prompt threshold (portion of denoising for which to fix self attention maps).",
-    )
-    group.add_argument(
-        "--max-p2p",
-        type=float,
-        default=0.9,
-        help="Max prompt2prompt threshold (portion of denoising for which to fix self attention maps).",
-    )
+    group.add_argument("--n-samples", type=int, default=100,
+                       help="Number of samples to generate per prompt (before CLIP filtering).")
+    group.add_argument("--max-out-samples", type=int, default=4,
+                       help="Max number of output samples to save per prompt (after CLIP filtering)")
+    group.add_argument("--n-partitions", type=int, default=1,
+                       help="Number of total partitions.")
+    group.add_argument("--partition", type=int,
+                       default=0, help="Partition index.")
+    group.add_argument("--min-p2p", type=float, default=0.1,
+                       help="Min prompt2prompt threshold (portion of denoising for which to fix self attention maps).")
+    group.add_argument("--max-p2p", type=float, default=0.9,
+                       help="Max prompt2prompt threshold (portion of denoising for which to fix self attention maps).")
+    group.add_argument("--min-cfg", type=float, default=7.5,
+                       help="Min cfg threshold (portion of denoising for which to fix self attention maps).")
+    group.add_argument("--max-cfg", type=float, default=15,
+                       help="Max cfg threshold (portion of denoising for which to fix self attention maps).")
+    group.add_argument("--clip-threshold", type=float, default=0.2,
+                       help="CLIP threshold for text-motion similarity of each image.")
+    group.add_argument("--clip-dir-threshold", type=float, default=0.2,
+                       help="Directional CLIP threshold for similarity of change between pairs of text and pairs of motions.")
+    group.add_argument("--clip-motion-threshold", type=float, default=0.7,
+                       help="CLIP threshold for motion-motion similarity.")
+
 
 def add_edit_options(parser):
     group = parser.add_argument_group('edit')
@@ -227,6 +244,7 @@ def add_custom_options(parser):
     group.add_argument("--noise", default='', type=str,
                        help="Path to a npy file that lists initial noise for each sample. The shape should be (263, 1, 120). If multiple samples are provided, the noise will be repeated.")
 
+
 def get_cond_mode(args):
     if args.unconstrained:
         cond_mode = 'no_cond'
@@ -258,10 +276,13 @@ def generate_args():
     cond_mode = get_cond_mode(args)
 
     if (args.input_text or args.text_prompt) and cond_mode != 'text':
-        raise Exception('Arguments input_text and text_prompt should not be used for an action condition. Please use action_file or action_name.')
+        raise Exception(
+            'Arguments input_text and text_prompt should not be used for an action condition. Please use action_file or action_name.')
     elif (args.action_file or args.action_name) and cond_mode != 'action':
-        raise Exception('Arguments action_file and action_name should not be used for a text condition. Please use input_text or text_prompt.')
+        raise Exception(
+            'Arguments action_file and action_name should not be used for a text condition. Please use input_text or text_prompt.')
     return args
+
 
 def generate_motion_dataset_args():
     parser = ArgumentParser()
@@ -275,10 +296,13 @@ def generate_motion_dataset_args():
     cond_mode = get_cond_mode(args)
 
     if (args.input_text or args.text_prompt) and cond_mode != 'text':
-        raise Exception('Arguments input_text and text_prompt should not be used for an action condition. Please use action_file or action_name.')
+        raise Exception(
+            'Arguments input_text and text_prompt should not be used for an action condition. Please use action_file or action_name.')
     elif (args.action_file or args.action_name) and cond_mode != 'action':
-        raise Exception('Arguments action_file and action_name should not be used for a text condition. Please use input_text or text_prompt.')
+        raise Exception(
+            'Arguments action_file and action_name should not be used for a text condition. Please use input_text or text_prompt.')
     return args
+
 
 def edit_args():
     parser = ArgumentParser()
