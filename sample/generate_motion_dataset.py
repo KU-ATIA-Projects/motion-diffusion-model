@@ -44,25 +44,6 @@ def main():
             out_path += '_' + os.path.basename(args.input_text).replace('.txt', '').replace(' ', '_').replace('.', '')
 
     # this block must be called BEFORE the dataset is loaded
-    # if args.text_prompt != '':
-    #     texts = [args.text_prompt]
-    #     args.num_samples = 1
-    # elif args.input_text != '':
-    #     assert os.path.exists(args.input_text)
-    #     with open(args.input_text, 'r') as fr:
-    #         texts = fr.readlines()
-    #     texts = [s.replace('\n', '') for s in texts]
-    #     args.num_samples = len(texts)
-    # elif args.action_name:
-    #     action_text = [args.action_name]
-    #     args.num_samples = 1
-    # elif args.action_file != '':
-    #     assert os.path.exists(args.action_file)
-    #     with open(args.action_file, 'r') as fr:
-    #         action_text = fr.readlines()
-    #     action_text = [s.replace('\n', '') for s in action_text]
-    #     args.num_samples = len(action_text)
-    
     assert args.input_text != '' and os.path.exists(args.input_text) and args.input_text.endswith('.jsonl')
     with open(args.input_text, 'r') as fp:
         # We assume that the input text file is a jsonl file with the following format:
@@ -71,8 +52,9 @@ def main():
         # Therefore we don't need to change MDM code to support this format
         prompts = [json.loads(line) for line in fp]
         texts = [[prompt['input'], prompt['output']] for prompt in prompts]
-        texts = [item for sublist in texts for item in sublist]
-        args.num_samples = len(texts)
+        # texts = [item for sublist in texts for item in sublist]
+        # args.num_samples = len(texts)
+        args.num_samples = 2
 
     assert args.num_samples <= args.batch_size, \
         f'Please either increase batch_size({args.batch_size}) or reduce num_samples({args.num_samples})'
@@ -98,37 +80,17 @@ def main():
     model.to(dist_util.dev())
     model.eval()  # disable random masking
 
-    # import pickle
-
-    # with open('mdm_model.pkl', 'wb') as f:
-    #     pickle.dump(model, f)
-
-    # raise Exception('stop')
-
-    if is_using_data:
-        iterator = iter(data)
-        _, model_kwargs = next(iterator)
-    else:
-        collate_args = [{'inp': torch.zeros(n_frames), 'tokens': None, 'lengths': n_frames}] * args.num_samples
-        is_t2m = any([args.input_text, args.text_prompt])
-        if is_t2m:
-            # t2m
-            collate_args = [dict(arg, text=txt) for arg, txt in zip(collate_args, texts)]
-        else:
-            # a2m
-            pass
-            # action = data.dataset.action_name_to_action(action_text)
-            # collate_args = [dict(arg, action=one_action, action_text=one_action_text) for
-                            # arg, one_action, one_action_text in zip(collate_args, action, action_text)]
-        _, model_kwargs = collate(collate_args)
-
     all_motions = []
     all_lengths = []
     all_text = []
 
-    for rep_i in range(args.num_repetitions):
-        print(f'### Sampling [repetitions #{rep_i}]')
+    collate_args = [{'inp': torch.zeros(n_frames), 'tokens': None, 'lengths': n_frames}] * args.num_samples
+    for text_pair in texts:
+        collate_args = [dict(arg, text=txt) for arg, txt in zip(collate_args, text_pair)]
+        _, model_kwargs = collate(collate_args)
 
+        p2p_threshold = args.min_p2p + torch.rand(()).item() * (args.max_p2p - args.min_p2p)
+        cfg_scale = args.min_cfg + torch.rand(()).item() * (args.max_cfg - args.min_cfg)
         # add CFG scale to batch
         if args.guidance_param != 1:
             model_kwargs['y']['scale'] = torch.ones(args.batch_size, device=dist_util.dev()) * args.guidance_param
