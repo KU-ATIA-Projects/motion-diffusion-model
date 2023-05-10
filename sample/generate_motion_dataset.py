@@ -4,6 +4,7 @@ Generate a large batch of image samples from a model and save them as a large
 numpy array. This can be used to produce samples for FID evaluation.
 """
 import sys
+from pathlib import Path
 from getpass import getuser
 sys.path.append(f'/home/{getuser()}/motion-diffusion-model/')
 from utils.fixseed import fixseed
@@ -22,7 +23,8 @@ import shutil
 from data_loaders.tensors import collate
 
 import json
-
+from tqdm import tqdm
+from ..metrics import ClipSimilarity
 
 def main():
     args = generate_motion_dataset_args()
@@ -31,6 +33,7 @@ def main():
     name = os.path.basename(os.path.dirname(args.model_path))
     niter = os.path.basename(args.model_path).replace('model', '').replace('.pt', '')
     max_frames = 196 if args.dataset in ['kit', 'humanml'] else 60
+    skeleton = paramUtil.kit_kinematic_chain if args.dataset == 'kit' else paramUtil.t2m_kinematic_chain
     fps = 12.5 if args.dataset == 'kit' else 20
     n_frames = min(max_frames, int(args.motion_length*fps))
     is_using_data = not any([args.input_text, args.text_prompt, args.action_file, args.action_name])
@@ -80,57 +83,112 @@ def main():
     model.to(dist_util.dev())
     model.eval()  # disable random masking
 
+    # MDM log variables
     all_motions = []
     all_lengths = []
     all_text = []
 
-    collate_args = [{'inp': torch.zeros(n_frames), 'tokens': None, 'lengths': n_frames}] * args.num_samples
-    for text_pair in texts:
-        collate_args = [dict(arg, text=txt) for arg, txt in zip(collate_args, text_pair)]
+    _collate_args = [{'inp': torch.zeros(n_frames), 'tokens': None, 'lengths': n_frames}] * args.num_samples
+
+    # CLIP similarity filtering from ip2p
+    clip_similarity = ClipSimilarity().cuda()
+
+    out_dir = Path(out_path)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Generate samples pair by pair
+    for i, prompt in tqdm(texts, desc="Prompts"):
+
+        prompt_dir = out_dir.joinpath(f"{i:07d}")
+        prompt_dir.mkdir(exist_ok=True)
+
+        with open(prompt_dir.joinpath('prompt.json'), 'w') as fp:
+            json.dump(prompt, fp)
+        
+        collate_args = [dict(arg, text=txt) for arg, txt in zip(_collate_args, prompt)]
         _, model_kwargs = collate(collate_args)
 
-        p2p_threshold = args.min_p2p + torch.rand(()).item() * (args.max_p2p - args.min_p2p)
-        model.prompt2prompt_threshold = p2p_threshold
+        results = {} # used to store multiple generation amd avoid duplicate samples
 
+        with tqdm(total=args.n_samples, desc="Samples") as progress_bar:
+            while len(results) < args.n_samples:
+                seed = torch.randint(1 << 32, ()).item()
+                if seed in results:
+                    continue
+                torch.manual_seed(seed)
+                
+                p2p_threshold = args.min_p2p + torch.rand(()).item() * (args.max_p2p - args.min_p2p)
+                model.prompt2prompt_threshold = p2p_threshold
 
-        cfg_scale = args.min_cfg + torch.rand(()).item() * (args.max_cfg - args.min_cfg)
-        # add CFG scale to batch
-        if args.guidance_param != 1:
-            # model_kwargs['y']['scale'] = torch.ones(args.batch_size, device=dist_util.dev()) * args.guidance_param
-            model_kwargs['y']['scale'] = torch.ones(args.batch_size, device=dist_util.dev()) * cfg_scale
+                cfg_scale = args.min_cfg + torch.rand(()).item() * (args.max_cfg - args.min_cfg)
+                # add CFG scale to batch
+                if args.guidance_param != 1:
+                    # model_kwargs['y']['scale'] = torch.ones(args.batch_size, device=dist_util.dev()) * args.guidance_param
+                    model_kwargs['y']['scale'] = torch.ones(args.batch_size, device=dist_util.dev()) * cfg_scale
 
-        sample_fn = diffusion.p_sample_loop
-        sample = sample_fn(
-            model,
-            (args.batch_size, model.njoints, model.nfeats, n_frames),
-            clip_denoised=False,
-            model_kwargs=model_kwargs,
-            skip_timesteps=0,  # 0 is the default value - i.e. don't skip any step
-            init_image=None,
-            progress=True,
-            dump_steps=None,
-            noise=None,
-            const_noise=False,
-        )
+                sample_fn = diffusion.p_sample_loop
+                sample = sample_fn(
+                    model,
+                    (args.batch_size, model.njoints, model.nfeats, n_frames),
+                    clip_denoised=False,
+                    model_kwargs=model_kwargs,
+                    skip_timesteps=0,  # 0 is the default value - i.e. don't skip any step
+                    init_image=None,
+                    progress=True,
+                    dump_steps=None,
+                    noise=None,
+                    const_noise=False,
+                )
 
-        # Recover XYZ *positions* from HumanML3D vector representation
-        if model.data_rep == 'hml_vec':
-            n_joints = 22 if sample.shape[1] == 263 else 21
-            sample = data.dataset.t2m_dataset.inv_transform(sample.cpu().permute(0, 2, 3, 1)).float()
-            sample = recover_from_ric(sample, n_joints)
-            sample = sample.view(-1, *sample.shape[2:]).permute(0, 2, 3, 1)
+                # Recover XYZ *positions* from HumanML3D vector representation
+                if model.data_rep == 'hml_vec':
+                    n_joints = 22 if sample.shape[1] == 263 else 21
+                    sample = data.dataset.t2m_dataset.inv_transform(sample.cpu().permute(0, 2, 3, 1)).float()
+                    sample = recover_from_ric(sample, n_joints)
+                    sample = sample.view(-1, *sample.shape[2:]).permute(0, 2, 3, 1)
 
-        rot2xyz_pose_rep = 'xyz' if model.data_rep in ['xyz', 'hml_vec'] else model.data_rep
-        rot2xyz_mask = None if rot2xyz_pose_rep == 'xyz' else model_kwargs['y']['mask'].reshape(args.batch_size, n_frames).bool()
-        sample = model.rot2xyz(x=sample, mask=rot2xyz_mask, pose_rep=rot2xyz_pose_rep, glob=True, translation=True,
-                               jointstype='smpl', vertstrans=True, betas=None, beta=0, glob_rot=None,
-                               get_rotations_back=False)
+                rot2xyz_pose_rep = 'xyz' if model.data_rep in ['xyz', 'hml_vec'] else model.data_rep
+                rot2xyz_mask = None if rot2xyz_pose_rep == 'xyz' else model_kwargs['y']['mask'].reshape(args.batch_size, n_frames).bool()
+                sample = model.rot2xyz(x=sample, mask=rot2xyz_mask, pose_rep=rot2xyz_pose_rep, glob=True, translation=True,
+                                    jointstype='smpl', vertstrans=True, betas=None, beta=0, glob_rot=None,
+                                    get_rotations_back=False)
+                
+                assert len(sample) == args.batch_size
+                x0, x1 = sample
 
-        if args.unconstrained:
-            all_text += ['unconstrained'] * args.num_samples
-        else:
-            text_key = 'text' if 'text' in model_kwargs['y'] else 'action_text'
-            all_text += model_kwargs['y'][text_key]
+                clip_sim_0, clip_sim_1, clip_sim_dir, clip_sim_image = clip_similarity(x0, x1, [prompt[0]], [prompt[1]])
+                results[seed] = dict(
+                    motion_0=x0,
+                    motion_1=x1,
+                    p2p_threshold=p2p_threshold,
+                    cfg_scale=cfg_scale,
+                    clip_sim_0=clip_sim_0[0].item(),
+                    clip_sim_1=clip_sim_1[0].item(),
+                    clip_sim_dir=clip_sim_dir[0].item(),
+                    clip_sim_image=clip_sim_image[0].item(),
+                )
+
+                progress_bar.update()
+
+        metadata = [
+            (result["clip_sim_dir"], seed) 
+            for seed, result in results.items() 
+            if result["clip_sim_image"] >= args.clip_img_threshold
+            and result["clip_sim_dir"] >= args.clip_dir_threshold
+            and result["clip_sim_0"] >= args.clip_sim_threshold
+            and result["clip_sim_1"] >= args.clip_sim_threshold            
+        ]
+
+        metadata.sort(reverse=True)
+        for _, seed in metadata[:, args.max_out_samples]:
+            result = results[seed]
+            motion_0 = result.pop("motion_0")
+            motion_1 = result.pop("motion_1")
+            plot_3d_motion(motion_0, os.path.join(args.output_dir, f"{seed}_0.png"))
+            plot_3d_motion(motion_1, os.path.join(args.output_dir, f"{seed}_1.png"))
+
+        text_key = 'text' if 'text' in model_kwargs['y'] else 'action_text'
+        all_text += model_kwargs['y'][text_key]
 
         all_motions.append(sample.cpu().numpy())
         all_lengths.append(model_kwargs['y']['lengths'].cpu().numpy())
@@ -158,7 +216,7 @@ def main():
         fw.write('\n'.join([str(l) for l in all_lengths]))
 
     print(f"saving visualizations to [{out_path}]...")
-    skeleton = paramUtil.kit_kinematic_chain if args.dataset == 'kit' else paramUtil.t2m_kinematic_chain
+    
 
     sample_files = []
     num_samples_in_out_file = 7
