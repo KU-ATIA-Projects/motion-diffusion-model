@@ -46,10 +46,10 @@ def main():
     # this block must be called BEFORE the dataset is loaded
     assert args.input_text != '' and os.path.exists(args.input_text) and args.input_text.endswith('.jsonl')
     with open(args.input_text, 'r') as fp:
-        # We assume that the input text file is a jsonl file with the following format:
-        # {"input": "The first sentence", "output": "The second sentence"}
-        # We make sure the odd lines are the input and the even lines are the output
-        # Therefore we don't need to change MDM code to support this format
+        # * We assume that the input text file is a jsonl file with the following format:
+        # * {"input": "The first sentence", "output": "The second sentence"}
+        # * We make sure the odd lines are the input and the even lines are the output
+        # * Therefore we don't need to change MDM code to support this format
         prompts = [json.loads(line) for line in fp]
         texts = [[prompt['input'], prompt['output']] for prompt in prompts]
         # texts = [item for sublist in texts for item in sublist]
@@ -90,10 +90,14 @@ def main():
         _, model_kwargs = collate(collate_args)
 
         p2p_threshold = args.min_p2p + torch.rand(()).item() * (args.max_p2p - args.min_p2p)
+        model.prompt2prompt_threshold = p2p_threshold
+
+
         cfg_scale = args.min_cfg + torch.rand(()).item() * (args.max_cfg - args.min_cfg)
         # add CFG scale to batch
         if args.guidance_param != 1:
-            model_kwargs['y']['scale'] = torch.ones(args.batch_size, device=dist_util.dev()) * args.guidance_param
+            # model_kwargs['y']['scale'] = torch.ones(args.batch_size, device=dist_util.dev()) * args.guidance_param
+            model_kwargs['y']['scale'] = torch.ones(args.batch_size, device=dist_util.dev()) * cfg_scale
 
         sample_fn = diffusion.p_sample_loop
         sample = sample_fn(
