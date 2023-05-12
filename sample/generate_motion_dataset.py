@@ -24,7 +24,7 @@ from data_loaders.tensors import collate
 
 import json
 from tqdm import tqdm
-from ..metrics import ClipSimilarity
+from metrics.clip_similarity import ClipSimilarity
 
 def main():
     args = generate_motion_dataset_args()
@@ -48,9 +48,9 @@ def main():
 
     # this block must be called BEFORE the dataset is loaded
     assert args.input_text != '' and os.path.exists(args.input_text) and args.input_text.endswith('.jsonl')
+    # * We assume that the input text file is a jsonl file with the following format:
+    # * {"input": "The first sentence", "output": "The second sentence"}
     with open(args.input_text, 'r') as fp:
-        # * We assume that the input text file is a jsonl file with the following format:
-        # * {"input": "The first sentence", "output": "The second sentence"}
         # * We make sure the odd lines are the input and the even lines are the output
         # * Therefore we don't need to change MDM code to support this format
         prompts = [json.loads(line) for line in fp]
@@ -186,6 +186,8 @@ def main():
             motion_1 = result.pop("motion_1")
             plot_3d_motion(motion_0, os.path.join(args.output_dir, f"{seed}_0.png"))
             plot_3d_motion(motion_1, os.path.join(args.output_dir, f"{seed}_1.png"))
+            with open(prompt_dir.joinpath(f"metadata.jsonl"), "a") as fp:
+                fp.write(f"{json.dumps(dict(seed=seed, **result))}\n")
 
         text_key = 'text' if 'text' in model_kwargs['y'] else 'action_text'
         all_text += model_kwargs['y'][text_key]
