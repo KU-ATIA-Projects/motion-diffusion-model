@@ -142,3 +142,8 @@ mdm_model.pkl
 archive/
 *.pdf
 scripts/
+images/*
+notebooks/*.jpg
+notebooks/*.png
+notebooks/*.pdf
+notebooks/*.mp4
