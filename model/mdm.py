@@ -13,7 +13,7 @@ class MDM(nn.Module):
     def __init__(self, modeltype, njoints, nfeats, num_actions, translation, pose_rep, glob, glob_rot,
                  latent_dim=256, ff_size=1024, num_layers=8, num_heads=4, dropout=0.1,
                  ablation=None, activation="gelu", legacy=False, data_rep='rot6d', dataset='amass', clip_dim=512,
-                 arch='trans_enc', emb_trans_dec=False, clip_version=None, prompt2prompt_threshold=0.5, diffusion_steps=1000, **kargs):
+                 arch='trans_enc', emb_trans_dec=False, clip_version=None, prompt2prompt_threshold=-1, diffusion_steps=1000, **kargs):
         super().__init__()
 
         self.legacy = legacy
