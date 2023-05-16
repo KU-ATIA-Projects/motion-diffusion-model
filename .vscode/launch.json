@@ -32,7 +32,7 @@
                 "--model_path",
                 "./save/humanml_trans_enc_512/model000200000.pt",
                 "--input_text",
-                "/home/ctq566/instruct-pix2pix/assets/prompts.jsonl",
+                "/home/ctq566/motion-diffusion-model/assets/prompts_trial_2.jsonl",
                 "--batch_size",
                 "256",
                 // "--text_prompt",

@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 from getpass import getuser
 sys.path.append(f'/home/{getuser()}/motion-diffusion-model/')
+sys.path.append(f'/home/{getuser()}/motion-diffusion-model/MotionCLIP')
 from utils.fixseed import fixseed
 import os
 import numpy as np
@@ -24,7 +25,7 @@ from data_loaders.tensors import collate
 
 import json
 from tqdm import tqdm
-from metrics.clip_similarity import ClipSimilarity
+# from MotionCLIP.clip_similarity import ClipSimilarity
 
 def main():
     args = generate_motion_dataset_args()
@@ -91,13 +92,13 @@ def main():
     _collate_args = [{'inp': torch.zeros(n_frames), 'tokens': None, 'lengths': n_frames}] * args.num_samples
 
     # CLIP similarity filtering from ip2p
-    clip_similarity = ClipSimilarity().cuda()
+    # clip_similarity = ClipSimilarity().cuda()
 
     out_dir = Path(out_path)
     out_dir.mkdir(parents=True, exist_ok=True)
     
     # Generate samples pair by pair
-    for i, prompt in tqdm(texts, desc="Prompts"):
+    for i, prompt in tqdm(list(enumerate(texts)), desc="Prompts"):
 
         prompt_dir = out_dir.joinpath(f"{i:07d}")
         prompt_dir.mkdir(exist_ok=True)
@@ -156,38 +157,43 @@ def main():
                 assert len(sample) == args.batch_size
                 x0, x1 = sample
 
-                clip_sim_0, clip_sim_1, clip_sim_dir, clip_sim_image = clip_similarity(x0, x1, [prompt[0]], [prompt[1]])
-                results[seed] = dict(
-                    motion_0=x0,
-                    motion_1=x1,
-                    p2p_threshold=p2p_threshold,
-                    cfg_scale=cfg_scale,
-                    clip_sim_0=clip_sim_0[0].item(),
-                    clip_sim_1=clip_sim_1[0].item(),
-                    clip_sim_dir=clip_sim_dir[0].item(),
-                    clip_sim_image=clip_sim_image[0].item(),
-                )
+                # TODO use MotionCLIP to rewrite the CLIP similarity
+                # clip_sim_0, clip_sim_1, clip_sim_dir, clip_sim_motion = clip_similarity(
+                #     torch.unsqueeze(x0, 0).transpose(1, 2).to(device='cuda:0'), 
+                #     torch.unsqueeze(x1, 0).transpose(1, 2).to(device='cuda:0'), 
+                #     [prompt[0]], 
+                #     [prompt[1]])
+                # results[seed] = dict(
+                #     motion_0=x0,
+                #     motion_1=x1,
+                #     p2p_threshold=p2p_threshold,
+                #     cfg_scale=cfg_scale,
+                #     clip_sim_0=clip_sim_0[0].item(),
+                #     clip_sim_1=clip_sim_1[0].item(),
+                #     clip_sim_dir=clip_sim_dir[0].item(),
+                #     clip_sim_motion=clip_sim_motion[0].item(),
+                # )
 
                 progress_bar.update()
 
-        metadata = [
-            (result["clip_sim_dir"], seed) 
-            for seed, result in results.items() 
-            if result["clip_sim_image"] >= args.clip_img_threshold
-            and result["clip_sim_dir"] >= args.clip_dir_threshold
-            and result["clip_sim_0"] >= args.clip_sim_threshold
-            and result["clip_sim_1"] >= args.clip_sim_threshold            
-        ]
+        # metadata = [
+        #     (result["clip_sim_dir"], seed) 
+        #     for seed, result in results.items() 
+        #     if result["clip_sim_motion"] >= args.clip_motion_threshold
+        #     and result["clip_sim_dir"] >= args.clip_dir_threshold
+        #     and result["clip_sim_0"] >= args.clip_sim_threshold
+        #     and result["clip_sim_1"] >= args.clip_sim_threshold            
+        # ]
 
-        metadata.sort(reverse=True)
-        for _, seed in metadata[:, args.max_out_samples]:
-            result = results[seed]
-            motion_0 = result.pop("motion_0")
-            motion_1 = result.pop("motion_1")
-            plot_3d_motion(motion_0, os.path.join(args.output_dir, f"{seed}_0.png"))
-            plot_3d_motion(motion_1, os.path.join(args.output_dir, f"{seed}_1.png"))
-            with open(prompt_dir.joinpath(f"metadata.jsonl"), "a") as fp:
-                fp.write(f"{json.dumps(dict(seed=seed, **result))}\n")
+        # metadata.sort(reverse=True)
+        # for _, seed in metadata[:, args.max_out_samples]:
+        #     result = results[seed]
+        #     motion_0 = result.pop("motion_0")
+        #     motion_1 = result.pop("motion_1")
+        #     plot_3d_motion(motion_0, os.path.join(args.output_dir, f"{seed}_0.png"))
+        #     plot_3d_motion(motion_1, os.path.join(args.output_dir, f"{seed}_1.png"))
+        #     with open(prompt_dir.joinpath(f"metadata.jsonl"), "a") as fp:
+        #         fp.write(f"{json.dumps(dict(seed=seed, **result))}\n")
 
         text_key = 'text' if 'text' in model_kwargs['y'] else 'action_text'
         all_text += model_kwargs['y'][text_key]
