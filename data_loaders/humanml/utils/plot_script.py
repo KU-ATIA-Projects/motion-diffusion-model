@@ -129,4 +129,7 @@ def plot_3d_motion(save_path, kinematic_tree, joints, title, dataset, figsize=(3
     # ani = FuncAnimation(fig, update, frames=frame_number, interval=1000 / fps, repeat=False, init_func=init)
     # ani.save(save_path, writer='pillow', fps=1000 / fps)
 
+    # save motion data as well
+    np.save(save_path[:-4] + '.npy', data, allow_pickle=True)
+    
     plt.close()
