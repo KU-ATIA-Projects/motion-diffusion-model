@@ -207,6 +207,9 @@ def add_prompt2prompt_options(parser):
                        help="Directional CLIP threshold for similarity of change between pairs of text and pairs of motions.")
     group.add_argument("--clip-motion-threshold", type=float, default=0.5,
                        help="CLIP threshold for motion-motion similarity.")
+    
+    group.add_argument("--prompt2prompt-threshold", type=float, default=-1,
+                       help="Threshold for prompt2prompt. Once set, the CLIP similarity will be ignored.")
 
 
 def add_edit_options(parser):

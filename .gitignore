@@ -147,3 +147,4 @@ notebooks/*.jpg
 notebooks/*.png
 notebooks/*.pdf
 notebooks/*.mp4
+ViT-L-14.pt
