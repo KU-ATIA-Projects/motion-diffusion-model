@@ -126,7 +126,7 @@ def main():
     all_lengths = []
     all_text = []
 
-    model.prompt2prompt_threshold = args.prompt2prompt_threshold
+    model.model.prompt2prompt_threshold = args.prompt2prompt_threshold
 
     for rep_i in range(args.num_repetitions):
         print(f'### Sampling [repetitions #{rep_i}]')
