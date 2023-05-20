@@ -26,7 +26,12 @@ import json
 
 def main():
     args = generate_motion_dataset_args()
-    fixseed(args.seed)
+    if args.seed != -1:
+        fixseed(args.seed)
+    else:
+        seed = torch.randint(1 << 32, ()).item()
+        fixseed(seed)
+        print("The seed is: {}".format(seed))
     out_path = args.output_dir
     name = os.path.basename(os.path.dirname(args.model_path))
     niter = os.path.basename(args.model_path).replace('model', '').replace('.pt', '')
@@ -127,6 +132,7 @@ def main():
     all_text = []
 
     model.model.prompt2prompt_threshold = args.prompt2prompt_threshold
+    print(f"The args.prompt2prompt_threshold is {args.prompt2prompt_threshold}")
 
     for rep_i in range(args.num_repetitions):
         print(f'### Sampling [repetitions #{rep_i}]')
