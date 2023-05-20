@@ -1,0 +1,24 @@
+{"input": "With arms down in front of his body, the person clasps his hands.", "edit": "Slow down the hand clasping", "output": "With arms down in front of his body, the person slowly clasps his hands."}
+{"input": "With arms down in front of his body, the person slowly clasps his hands.", "edit": "Slow down the hand clasping", "output": ""}
+{"input": "With arms down in front of his body, the person clasps his hands.", "edit": "Extend the clapping duration.", "output": "With arms down in front of his body, the person clasps his hands for a longer duration."}
+{"input": "With arms down in front of his body, the person clasps his hands for a longer duration.", "edit": "Extend the clapping duration.", "output": ""}
+{"input": "A person walks forward, bends down to pick something up off the ground.", "edit": "Let the person walk backward.", "output": "A person walks forward, bends down to pick something up off the ground."}
+{"input": "A person walks forward, bends down to pick something up off the ground.", "edit": "Let the person walk backward.", "output": ""}
+{"input": "A person walks forward, bends down to pick something up off the ground.", "edit": "Make the upper body face right", "output": "A person walks forward with the upper body facing right, bends down to pick something up off the ground."}
+{"input": "A person walks forward with the upper body facing right, bends down to pick something up off the ground.", "edit": "Make the upper body face right", "output": ""}
+{"input": "A person kicks with their left leg.", "edit": "Change the left leg to right leg", "output": "A person kicks with their right leg."}
+{"input": "A person kicks with their right leg.", "edit": "Change the left leg to right leg", "output": ""}
+{"input": "A person kicks with their left leg.", "edit": "Kick a little higher", "output": "A person kicks high with their left leg."}
+{"input": "A person kicks high with their left leg.", "edit": "Kick a little higher", "output": ""}
+{"input": "A person turns to his right and paces back and forth.", "edit": "Stand a while before the turn", "output": "A person stand for a while and then turns to his right and paces back and forth."}
+{"input": "A person stand for a while and then turns to his right and paces back and forth.", "edit": "Stand a while before the turn", "output": ""}
+{"input": "A person turns to his right and paces back and forth.", "edit": "Remove the turn action", "output": "A person paces back and forth."}
+{"input": "A person paces back and forth.", "edit": "Remove the turn action", "output": ""}
+{"input": "A person walks forward, bends down doing something.", "edit": "Picking a box off the ground.", "output": "A person walks forward, bends down picking a box off the ground."}
+{"input": "A person walks forward, bends down picking a box off the ground.", "edit": "Picking a box off the ground.", "output": ""}
+{"input": "A person walks forward, bends down doing something.", "edit": "Bends down stroking the dog", "output": "A person walks forward, bends down stroking the dog."}
+{"input": "A person walks forward, bends down stroking the dog.", "edit": "Bends down stroking the dog", "output": ""}
+{"input": "The person walks to the door.", "edit": "Make the person walk gracefully", "output": "The person walks gracefully to the door."}
+{"input": "The person walks gracefully to the door.", "edit": "Make the person walk gracefully", "output": ""}
+{"input": "The person walks to the door.", "edit": "Walk like an old man", "output": "The person walks like an old man to the door."}
+{"input": "The person walks like an old man to the door.", "edit": "Walk like an old man", "output": ""}
