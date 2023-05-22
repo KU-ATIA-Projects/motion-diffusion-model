@@ -14,11 +14,11 @@
                 "--model_path",
                 "./save/humanml_trans_enc_512/model000200000.pt",
                 "--input_text",
-                "./assets/prompts_categories.txt",
+                "./assets/texts/naive_text_prompts.txt",
                 // "--text_prompt",
                 // "The man smiles angrily.",
                 "--num_repetitions",
-                "3",
+                "30",
             ],
             "justMyCode": false
         },

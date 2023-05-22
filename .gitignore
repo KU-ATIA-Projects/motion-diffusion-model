@@ -140,7 +140,8 @@ latent_vec/
 *.bak
 mdm_model.pkl
 archive/
-*.pdf
+assets/pdf/*
+assets/images/*
 scripts/
 images/*
 notebooks/*.jpg

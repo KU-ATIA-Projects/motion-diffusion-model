@@ -6,8 +6,8 @@
 {"input": "A person walks backward.", "edit": "Let the person walk backward.", "output": ""}
 {"input": "A person walks forward.", "edit": "Make the upper body face right", "output": "A person walks forward with the upper body facing right."}
 {"input": "A person walks forward with the upper body facing right.", "edit": "Make the upper body face right", "output": ""}
-{"input": "A person kicks down with their left leg.", "edit": "Change the left leg to right leg", "output": "A person kicks with their right leg."}
-{"input": "A person kicks with their right leg.", "edit": "Change the left leg to right leg", "output": ""}
+{"input": "A person kicks down with their left leg.", "edit": "Change the left leg to right leg", "output": "A person kicks down with their right leg."}
+{"input": "A person kicks down with their right leg.", "edit": "Change the left leg to right leg", "output": ""}
 {"input": "A person kicks down with their left leg.", "edit": "Kick a little higher", "output": "A person kicks high with their left leg."}
 {"input": "A person kicks high with their left leg.", "edit": "Kick a little higher", "output": ""}
 {"input": "A person turns to his right and paces back and forth.", "edit": "Stand a while before the turn", "output": "A person stand for a while and then turns to his right and paces back and forth."}
@@ -18,7 +18,7 @@
 {"input": "A person bends down picking a box off the ground.", "edit": "Picking a box off the ground.", "output": ""}
 {"input": "A person bends down doing something.", "edit": "Bends down greeting a kid", "output": "A person bends down greeting a kid."}
 {"input": "A person bends down greeting a kid.", "edit": "Bends down greeting a kid", "output": ""}
-{"input": "The person walks forward.", "edit": "Make the person walk gracefully", "output": "The person walks forward gracefully."}
-{"input": "The person walks forward gracefully.", "edit": "Make the person walk gracefully", "output": ""}
+{"input": "The person walks forward.", "edit": "Make the person walk angrily", "output": "The person walks forward angrily."}
+{"input": "The person walks forward angrily.", "edit": "Make the person walk angrily", "output": ""}
 {"input": "The person walks forward.", "edit": "Walk like an old man", "output": "The person walks forward like an old man."}
 {"input": "The person walks forward like an old man.", "edit": "Walk like an old man", "output": ""}
