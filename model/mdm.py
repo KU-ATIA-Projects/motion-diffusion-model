@@ -177,16 +177,16 @@ class MDM(nn.Module):
             # adding the timestep embed
             xseq = torch.cat((emb, x), axis=0)  # [seqlen+1, bs, d]
             xseq = self.sequence_pos_encoder(xseq)  # [seqlen+1, bs, d]
-
-            if timesteps[0] == 999 or timesteps[0] % 50 == 0:
-                # save latent vector
-                index = 0
-                save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_4/latent_vec_{timesteps[0]}_{index}.npy'
-                while os.path.exists(save_dir):
-                    index += 1
-                    save_dir = f'/home/{getuser()}/motion-diffusion-model/latent_vec//latent_vec_4/latent_vec_{timesteps[0]}_{index}.npy'
-                np.save(save_dir, xseq.detach().cpu().numpy())
-                print(f'latent vector saved to {save_dir}')
+            # if timesteps[0] == 999 or timesteps[0] % 50 == 0:
+            #     save_dir_prefix = f'/home/{getuser()}/motion-diffusion-model/latent_vec/latent_vec_4/'
+            #     # save latent vector
+            #     index = 0
+            #     save_dir = os.path.join(save_dir_prefix, f'latent_vec_{timesteps[0]}_{index}.npy')
+            #     while os.path.exists(save_dir):
+            #         index += 1
+            #         save_dir = os.path.join(save_dir_prefix, f'latent_vec_{timesteps[0]}_{index}.npy')
+            #     np.save(save_dir, xseq.detach().cpu().numpy())
+            #     print(f'latent vector saved to {save_dir}')
             prompt_to_prompt = self.prompt2prompt_threshold > (self.diffusion_steps - timesteps[0]) / self.diffusion_steps
             for layer in self.seqTransEncoder.layers:
                 layer.self_attn.prompt_to_prompt = prompt_to_prompt
