@@ -144,8 +144,6 @@ assets/pdf/*
 assets/images/*
 scripts/
 images/*
-notebooks/*.jpg
-notebooks/*.png
-notebooks/*.pdf
-notebooks/*.mp4
+notebooks/!*.ipynb
+notebooks/*/*
 ViT-L-14.pt

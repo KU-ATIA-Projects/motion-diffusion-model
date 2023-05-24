@@ -18,7 +18,7 @@
 {"input": "A person bends down picking a box off the ground.", "edit": "Picking a box off the ground.", "output": ""}
 {"input": "A person bends down doing something.", "edit": "Bends down greeting a kid", "output": "A person bends down greeting a kid."}
 {"input": "A person bends down greeting a kid.", "edit": "Bends down greeting a kid", "output": ""}
-{"input": "The person walks forward.", "edit": "Make the person walk angrily", "output": "The person walks forward angrily."}
-{"input": "The person walks forward angrily.", "edit": "Make the person walk angrily", "output": ""}
-{"input": "The person walks forward.", "edit": "Walk like an old man", "output": "The person walks forward like an old man."}
-{"input": "The person walks forward like an old man.", "edit": "Walk like an old man", "output": ""}
+{"input": "A person does a dance.", "edit": "Make the person excited.", "output": "A person does a excited dance."}
+{"input": "A person does a excited dance.", "edit": "Make the person excited.", "output": ""}
+{"input": "A person does a dance.", "edit": "Make a robot dance.", "output": "A person does a robot dance."}
+{"input": "A person does a robot dance.", "edit": "Make a robot dance.", "output": ""}
