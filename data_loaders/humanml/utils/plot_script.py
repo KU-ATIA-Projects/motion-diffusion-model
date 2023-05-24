@@ -1,3 +1,4 @@
+import os
 import math
 import numpy as np
 import matplotlib
@@ -25,7 +26,7 @@ def list_cut_average(ll, intervals):
 
 
 def plot_3d_motion(save_path, kinematic_tree, joints, title, dataset, figsize=(3, 3), fps=120, radius=3,
-                   vis_mode='default', gt_frames=[]):
+                   vis_mode='default', gt_frames=[], save_npy=False):
     matplotlib.use('Agg')
 
     title = '\n'.join(wrap(title, 20))
@@ -129,7 +130,8 @@ def plot_3d_motion(save_path, kinematic_tree, joints, title, dataset, figsize=(3
     # ani = FuncAnimation(fig, update, frames=frame_number, interval=1000 / fps, repeat=False, init_func=init)
     # ani.save(save_path, writer='pillow', fps=1000 / fps)
 
-    # save motion data as well
-    np.save(save_path[:-4] + '.npy', data, allow_pickle=True)
-    
+    # save motion data as well (but only when it is explicitly required and there are no such files yet)
+    if save_npy and not os.path.exists(save_path[:-4] + '.npy'):
+        np.save(save_path[:-4] + '.npy', data, allow_pickle=True)
+
     plt.close()
