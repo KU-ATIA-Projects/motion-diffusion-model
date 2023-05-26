@@ -33,15 +33,15 @@
                 "--model_path",
                 "./save/humanml_trans_enc_512/model000200000.pt",
                 "--input_text",
-                "/home/ctq566/motion-diffusion-model/assets/prompts_trial_2_quaternion.jsonl",
+                "/home/ctq566/motion-diffusion-model/assets/prompts/prompts_categories.jsonl",
                 "--batch_size",
                 "512",
                 "--num_repetitions",
-                "1",
+                "10",
                 "--prompt2prompt-threshold",
                 "0.7",
-                "--output_dir",
-                "./save/p2p_quaternion/07"
+                // "--output_dir",
+                // "./save/p2p_quaternion/07"
             ],
             "justMyCode": false
         },
