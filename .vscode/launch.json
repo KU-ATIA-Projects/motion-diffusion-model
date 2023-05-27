@@ -24,6 +24,20 @@
             "justMyCode": false
         },
         {
+            "name": "Python: Latent to Motion",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/sample/generate_from_latent.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--model_path",
+                "./save/humanml_trans_enc_512/model000200000.pt",
+                "--output_dir",
+                "./save/interpolation"
+            ],
+            "justMyCode": false
+        },
+        {
             "name": "Python: Generate motion dataset",
             "type": "python",
             "request": "launch",
