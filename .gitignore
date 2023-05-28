@@ -145,5 +145,4 @@ assets/images/*
 scripts/
 images/*
 notebooks/!*.ipynb
-notebooks/*/*
 ViT-L-14.pt
