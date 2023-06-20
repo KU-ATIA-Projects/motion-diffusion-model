@@ -130,6 +130,22 @@
                 "A person claps hands."
             ],
             "justMyCode": true
+        },
+        {
+            "name": "Python: Joint2SMPL",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/visualize/simplify_loc2rot.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--input_path",
+                "./save/p2p_quaternion_2_random/001/sample00_rep00.npy",
+                "--cuda",
+                "True",
+                "--device",
+                "0"
+            ],
+            "justMyCode": true
         }
     ]
 }

@@ -101,3 +101,35 @@ def _rotation_6d_to_euler(d6):
 
     return eul_deg
 
+
+def motions2rot6d(motions, device=0, cuda=True):
+    nreps, njoints, nfeats, nframes = motions.shape
+    j2s = joints2smpl(num_frames=nframes, device_id=device, cuda=cuda)
+    thetas = []
+    root_translation = []
+    for rep_idx in range(nreps):
+        rep_motions = motions[rep_idx].transpose(2, 0, 1)  # [nframes, njoints, 3]
+
+        if nfeats == 3:
+            print(f'Running SMPLify for repetition [{rep_idx + 1}] of {nreps}, it may take a few minutes.')
+            motion_tensor, opt_dict = j2s.joint2smpl(rep_motions)  # [nframes, njoints, 3]
+            motion = motion_tensor.cpu().numpy()
+
+        elif nfeats == 6:
+            motion = rep_motions
+            thetas.append(rep_motions)
+
+        thetas_6d = motion[0, :-1, :, :nframes].transpose(2, 0, 1)  # [nframes, njoints, 6]
+        thetas.append(thetas_6d)
+        root_translation.append([motion[0, -1, :3, :nframes].transpose(1, 0)])  # [nframes, 3]
+
+    # thetas = np.concatenate(thetas, axis=0)[:nframes]
+    root_translation = np.concatenate(root_translation, axis=0)[:nframes]
+
+    data_dict = {
+        'joint_map': JOINT_MAP,
+        'thetas': np.asarray(thetas),  # [nreps, nframes, njoints, 3 (deg)]
+        'root_translation': root_translation.tolist(), # [nreps, nframes, 3 (xyz)]
+    }
+
+    return data_dict
