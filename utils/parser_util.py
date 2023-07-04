@@ -185,25 +185,26 @@ def add_generate_options(parser):
 
 def add_prompt2prompt_options(parser):
     group = parser.add_argument_group('prompt2prompt')
-    group.add_argument("--n-samples", type=int, default=2,
+    group.add_argument("--index-base", type=int, default=0, help="Index base for motion editing dataset generation.")
+    group.add_argument("--n-samples", type=int, default=10,
                        help="Number of samples to generate per prompt (before CLIP filtering).")
-    group.add_argument("--max-out-samples", type=int, default=1,
+    group.add_argument("--max-out-samples", type=int, default=4,
                        help="Max number of output samples to save per prompt (after CLIP filtering)")
     group.add_argument("--n-partitions", type=int, default=1,
                        help="Number of total partitions.")
     group.add_argument("--partition", type=int,
                        default=0, help="Partition index.")
-    group.add_argument("--min-p2p", type=float, default=0.1,
+    group.add_argument("--min-p2p", type=float, default=0.01,
                        help="Min prompt2prompt threshold (portion of denoising for which to fix self attention maps).")
-    group.add_argument("--max-p2p", type=float, default=0.9,
+    group.add_argument("--max-p2p", type=float, default=0.10,
                        help="Max prompt2prompt threshold (portion of denoising for which to fix self attention maps).")
     group.add_argument("--min-cfg", type=float, default=7.5,
                        help="Min cfg threshold (portion of denoising for which to fix self attention maps).")
     group.add_argument("--max-cfg", type=float, default=15,
                        help="Max cfg threshold (portion of denoising for which to fix self attention maps).")
     group.add_argument("--clip-threshold", type=float, default=0.1,
-                       help="CLIP threshold for text-motion similarity of each image.")
-    group.add_argument("--clip-dir-threshold", type=float, default=0.1,
+                       help="CLIP threshold for text-motion similarity.")
+    group.add_argument("--clip-dir-threshold", type=float, default=0,
                        help="Directional CLIP threshold for similarity of change between pairs of text and pairs of motions.")
     group.add_argument("--clip-motion-threshold", type=float, default=0.5,
                        help="CLIP threshold for motion-motion similarity.")

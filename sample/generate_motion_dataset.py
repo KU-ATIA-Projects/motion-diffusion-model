@@ -7,6 +7,7 @@ import os
 import sys
 from getpass import getuser
 sys.path.append(f'/home/{getuser()}/motion-diffusion-model/')
+sys.path.append(f'/home/{getuser()}/motion-diffusion-model/flame')
 
 from pathlib import Path
 import json
@@ -120,7 +121,9 @@ def main():
     all_lengths = []
     all_text = []
 
-    model.model.prompt2prompt_threshold = args.prompt2prompt_threshold
+    p2p_threshold = args.min_p2p + torch.rand(()).item() * (args.max_p2p - args.min_p2p)
+    args.prompt2prompt_threshold = p2p_threshold
+    model.model.prompt2prompt_threshold = p2p_threshold
     print(
         f"The args.prompt2prompt_threshold is {args.prompt2prompt_threshold}")
 
@@ -196,9 +199,8 @@ def clip_similarity_filtering(all_motions, prompts, out_path, args, ckpt_path=f'
     out_dir = Path(out_path)
     out_dir.mkdir(exist_ok=True, parents=True)
 
-    for i, prompt in tqdm(prompts, desc = "Prompts"):
-
-        prompt_dir = out_path.joinpath(f'{i:07d}')
+    for i, prompt in enumerate(prompts):
+        prompt_dir = out_dir.joinpath(f'{i:07d}')
         prompt_dir.mkdir(parents=True, exist_ok=True)
 
         with open(prompt_dir.joinpath('prompt.json'), 'w') as fp:
@@ -207,10 +209,10 @@ def clip_similarity_filtering(all_motions, prompts, out_path, args, ckpt_path=f'
         results = []
 
         for rep in range(args.num_repetitions):
-            motion_0 = all_motions[rep][2 * i]
-            motion_1 = all_motions[rep][2 * i + 1]
-            text_0 = prompts['prompt']
-            text_1 = prompts['edited']
+            motion_0 = all_motions[rep][2 * i].transpose(2, 0, 1)
+            motion_1 = all_motions[rep][2 * i + 1].transpose(2, 0, 1)
+            text_0 = [prompt['prompt']]
+            text_1 = [prompt['edited']]
 
             sim_0, sim_1, sim_direction, sim_motion = clip_similarity(
                 torch.tensor(motion_0, device='cuda:0'),
@@ -223,8 +225,8 @@ def clip_similarity_filtering(all_motions, prompts, out_path, args, ckpt_path=f'
                 motion_1=motion_1,
                 text_0=text_0,
                 text_1=text_1,
-                p2p_threshold=args.p2p_threshold,
-                cfg_scale=7.5,
+                p2p_threshold=args.prompt2prompt_threshold,
+                cfg_scale=args.guidance_param,
                 clip_sim_0=sim_0,
                 clip_sim_1=sim_1,
                 clip_sim_direction=sim_direction,
@@ -237,7 +239,7 @@ def clip_similarity_filtering(all_motions, prompts, out_path, args, ckpt_path=f'
                                        and x['clip_sim_motion'] >= args.clip_motion_threshold, 
                                        results))
         
-        filtered_results.sort(key=lambda x: x['clip_sim_direction'])
+        filtered_results.sort(key=lambda x: x['clip_sim_direction'], reverse=True)
         filtered_results = filtered_results[:args.max_out_samples]
         for k, res in enumerate(filtered_results):
             motion_0 = res['motion_0']
@@ -245,24 +247,38 @@ def clip_similarity_filtering(all_motions, prompts, out_path, args, ckpt_path=f'
             text_0 = res['text_0']
             text_1 = res['text_1']
 
-            plot_3d_motion(animation_save_path=prompt_dir.joinpath(f"{k}_0.mp4"), 
-                           skeleton=paramUtil.t2m_kinematic_chain, 
-                           motion=motion_0, 
-                           dataset='humanml', 
-                           title=text_0, 
+            plot_3d_motion(prompt_dir.joinpath(f"{i:07d}_{k}_0.mp4"), 
+                           paramUtil.t2m_kinematic_chain, 
+                           motion_0,  
+                           text_0[0], 
+                           'humanml',
                            fps=20)
             
-            plot_3d_motion(animation_save_path=prompt_dir.joinpath(f"{k}_1.mp4"),
-                            skeleton=paramUtil.t2m_kinematic_chain,
-                            motion=motion_1,
-                            dataset='humanml',
-                            title=text_1,
-                            fps=20)
-            
-            np.save(prompt_dir.joinpath(f"{k}_0.npy"), motion_0)
-            np.save(prompt_dir.joinpath(f"{k}_1.npy"), motion_1)
-            with open(prompt_dir.joinpath(f"metadata.jsonl"), "a") as fp:
-                fp.write(json.dumps(**res) + '\n')
+            plot_3d_motion(prompt_dir.joinpath(f"{i:07d}_{k}_1.mp4"),
+                           paramUtil.t2m_kinematic_chain,
+                           motion_1,
+                           text_1[0],
+                           'humanml',
+                           fps=20)
+            motion_0_path = prompt_dir.joinpath(f"{i:07d}_{k}_0.npy")
+            motion_1_path = prompt_dir.joinpath(f"{i:07d}_{k}_1.npy")
+            np.save(motion_0_path, motion_0)
+            np.save(motion_1_path, motion_1)
+            try:
+                with open(prompt_dir.joinpath(f"metadata.jsonl"), "a") as fp:
+                    fp.write(json.dumps(dict(
+                        motion_0=os.path.abspath(motion_0_path), 
+                        motion_1=os.path.abspath(motion_1_path),
+                        text_0=text_0[0],
+                        text_1=text_1[0],
+                        clip_sim_0=res['clip_sim_0'].cpu().numpy().tolist(),
+                        clip_sim_1=res['clip_sim_1'].cpu().numpy().tolist(),
+                        clip_sim_direction=res['clip_sim_direction'].cpu().numpy().tolist(),
+                        clip_sim_motion=res['clip_sim_motion'].cpu().numpy().tolist(),
+                        )) + '\n')
+            except Exception as e:
+                import warnings
+                warnings.warn(e)
 
 
 if __name__ == "__main__":
