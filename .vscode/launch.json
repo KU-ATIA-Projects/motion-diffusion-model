@@ -60,6 +60,26 @@
             "justMyCode": false
         },
         {
+            "name": "Python: Generate motion dataset (with CLIP similarity filtering)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/sample/generate_motion_dataset.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--model_path",
+                "./save/humanml_trans_enc_512/model000200000.pt",
+                "--input_text",
+                "/home/ctq566/motion-diffusion-model/assets/prompts/prompts_1_10.jsonl",
+                "--batch_size",
+                "128",
+                "--num_repetitions",
+                "2",
+                // "--output_dir",
+                // "./save/p2p_quaternion/07"
+            ],
+            "justMyCode": false
+        },
+        {
             "name": "Python: Action to Motion",
             "type": "python",
             "request": "launch",
