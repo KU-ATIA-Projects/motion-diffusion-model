@@ -68,6 +68,7 @@ def main():
         # We make sure the odd lines are the input and the even lines are the output
         # Therefore we don't need to change MDM code to support this format
         prompts = [json.loads(line) for line in fp]
+        prompts = prompts[args.index_base:args.index_base + args.num_samples]
         texts = [[prompt['prompt'], prompt['edited']] for prompt in prompts]
         texts = [item for sublist in texts for item in sublist]
         args.num_samples = len(texts)
@@ -121,14 +122,12 @@ def main():
     all_lengths = []
     all_text = []
 
-    p2p_threshold = args.min_p2p + torch.rand(()).item() * (args.max_p2p - args.min_p2p)
-    args.prompt2prompt_threshold = p2p_threshold
-    model.model.prompt2prompt_threshold = p2p_threshold
-    print(
-        f"The args.prompt2prompt_threshold is {args.prompt2prompt_threshold}")
-
     for rep_i in range(args.num_repetitions):
         print(f'### Sampling [repetitions #{rep_i}]')
+        p2p_threshold = args.min_p2p + torch.rand(()).item() * (args.max_p2p - args.min_p2p)
+        args.prompt2prompt_threshold = p2p_threshold
+        model.model.prompt2prompt_threshold = p2p_threshold
+        print(f"The args.prompt2prompt_threshold is {args.prompt2prompt_threshold}")
 
         # add CFG scale to batch
         if args.guidance_param != 1:
@@ -200,7 +199,7 @@ def clip_similarity_filtering(all_motions, prompts, out_path, args, ckpt_path=f'
     out_dir.mkdir(exist_ok=True, parents=True)
 
     for i, prompt in enumerate(prompts):
-        prompt_dir = out_dir.joinpath(f'{i:07d}')
+        prompt_dir = out_dir.joinpath(f'{args.index_base + i:07d}') 
         prompt_dir.mkdir(parents=True, exist_ok=True)
 
         with open(prompt_dir.joinpath('prompt.json'), 'w') as fp:
@@ -233,14 +232,16 @@ def clip_similarity_filtering(all_motions, prompts, out_path, args, ckpt_path=f'
                 clip_sim_motion=sim_motion,
             ))
 
-        filtered_results = list(filter(lambda x: x['clip_sim_0'] >= args.clip_threshold 
-                                       and x['clip_sim_1'] >= args.clip_threshold 
-                                       and x['clip_sim_direction'] >= args.clip_dir_threshold 
-                                       and x['clip_sim_motion'] >= args.clip_motion_threshold, 
-                                       results))
-        
+        # ! Don't filter but save all results
+        # filtered_results = list(filter(lambda x: x['clip_sim_0'] >= args.clip_threshold 
+        #                                and x['clip_sim_1'] >= args.clip_threshold 
+        #                                and x['clip_sim_direction'] >= args.clip_dir_threshold 
+        #                                and x['clip_sim_motion'] >= args.clip_motion_threshold, 
+        #                                results))
+        filtered_results = results
         filtered_results.sort(key=lambda x: x['clip_sim_direction'], reverse=True)
-        filtered_results = filtered_results[:args.max_out_samples]
+        # ! save all results
+        # filtered_results = filtered_results[:args.max_out_samples]
         for k, res in enumerate(filtered_results):
             motion_0 = res['motion_0']
             motion_1 = res['motion_1']
@@ -271,6 +272,8 @@ def clip_similarity_filtering(all_motions, prompts, out_path, args, ckpt_path=f'
                         motion_1=os.path.abspath(motion_1_path),
                         text_0=text_0[0],
                         text_1=text_1[0],
+                        p2p_threshold=args.prompt2prompt_threshold,
+                        cfg_scale=args.guidance_param,
                         clip_sim_0=res['clip_sim_0'].cpu().numpy().tolist(),
                         clip_sim_1=res['clip_sim_1'].cpu().numpy().tolist(),
                         clip_sim_direction=res['clip_sim_direction'].cpu().numpy().tolist(),
