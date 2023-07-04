@@ -199,7 +199,8 @@ def clip_similarity_filtering(all_motions, prompts, out_path, args, ckpt_path=f'
     out_dir.mkdir(exist_ok=True, parents=True)
 
     for i, prompt in enumerate(prompts):
-        prompt_dir = out_dir.joinpath(f'{args.index_base + i:07d}') 
+        prompt_idx = args.index_base + i
+        prompt_dir = out_dir.joinpath(f'{prompt_idx:07d}') 
         prompt_dir.mkdir(parents=True, exist_ok=True)
 
         with open(prompt_dir.joinpath('prompt.json'), 'w') as fp:
@@ -248,21 +249,21 @@ def clip_similarity_filtering(all_motions, prompts, out_path, args, ckpt_path=f'
             text_0 = res['text_0']
             text_1 = res['text_1']
 
-            plot_3d_motion(prompt_dir.joinpath(f"{i:07d}_{k}_0.mp4"), 
+            plot_3d_motion(prompt_dir.joinpath(f"{prompt_idx:07d}_{k}_0.mp4"), 
                            paramUtil.t2m_kinematic_chain, 
                            motion_0,  
                            text_0[0], 
                            'humanml',
                            fps=20)
             
-            plot_3d_motion(prompt_dir.joinpath(f"{i:07d}_{k}_1.mp4"),
+            plot_3d_motion(prompt_dir.joinpath(f"{prompt_idx:07d}_{k}_1.mp4"),
                            paramUtil.t2m_kinematic_chain,
                            motion_1,
                            text_1[0],
                            'humanml',
                            fps=20)
-            motion_0_path = prompt_dir.joinpath(f"{i:07d}_{k}_0.npy")
-            motion_1_path = prompt_dir.joinpath(f"{i:07d}_{k}_1.npy")
+            motion_0_path = prompt_dir.joinpath(f"{prompt_idx:07d}_{k}_0.npy")
+            motion_1_path = prompt_dir.joinpath(f"{prompt_idx:07d}_{k}_1.npy")
             np.save(motion_0_path, motion_0)
             np.save(motion_1_path, motion_1)
             try:
