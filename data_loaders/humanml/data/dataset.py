@@ -779,3 +779,65 @@ class HumanML3D(data.Dataset):
 class KIT(HumanML3D):
     def __init__(self, mode, datapath='./dataset/kit_opt.txt', split="train", **kwargs):
         super(KIT, self).__init__(mode, datapath, split, **kwargs)
+
+
+class M2M(data.Dataset):
+    def __init__(self, mode, datapath='./dataset/m2m_opt.txt', split="train", **kwargs):
+        self.mode = mode
+        
+        self.dataset_name = 'm2m'
+        self.dataname = 'm2m'
+
+        # Configurations of T2M dataset and KIT dataset is almost the same
+        abs_base_path = f'.'
+        dataset_opt_path = pjoin(abs_base_path, datapath)
+        device = None  # torch.device('cuda:4') # This param is not in use in this context
+        opt = get_opt(dataset_opt_path, device)
+        opt.meta_dir = pjoin(abs_base_path, opt.meta_dir)
+        opt.motion_dir = pjoin(abs_base_path, opt.motion_dir)
+        opt.text_dir = pjoin(abs_base_path, opt.text_dir)
+        opt.model_dir = pjoin(abs_base_path, opt.model_dir)
+        opt.checkpoints_dir = pjoin(abs_base_path, opt.checkpoints_dir)
+        opt.data_root = pjoin(abs_base_path, opt.data_root)
+        opt.save_root = pjoin(abs_base_path, opt.save_root)
+        opt.meta_dir = './dataset'
+        self.opt = opt
+        print('Loading dataset %s ...' % opt.dataset_name)
+
+        if mode == 'gt':
+            # used by T2M models (including evaluators)
+            # 
+            self.mean = np.load(pjoin(opt.meta_dir, f'{opt.dataset_name}_mean.npy'))
+            self.std = np.load(pjoin(opt.meta_dir, f'{opt.dataset_name}_std.npy'))
+
+        elif mode in ['train', 'eval', 'text_only']:
+            # used by our models
+            self.mean = np.load("dataset/HumanML3D/Mean.npy")
+            self.std = np.load("dataset/HumanML3D/Std.npy")
+            # self.mean = np.load(pjoin(opt.data_root, 'Mean.npy'))
+            # self.std = np.load(pjoin(opt.data_root, 'Std.npy'))
+
+        if mode == 'eval':
+            # used by T2M models (including evaluators)
+            # this is to translate their norms to ours
+            self.mean_for_eval = np.load(pjoin(opt.meta_dir, f'{opt.dataset_name}_mean.npy'))
+            self.std_for_eval = np.load(pjoin(opt.meta_dir, f'{opt.dataset_name}_std.npy'))
+
+        self.split_file = pjoin(opt.data_root, f'{split}.txt')
+        if mode == 'text_only':
+            self.m2m_dataset = TextOnlyDataset(self.opt, self.mean, self.std, self.split_file)
+        else:
+            self.w_vectorizer = WordVectorizer(pjoin(abs_base_path, 'glove'), 'our_vab')
+            self.m2m_dataset = Text2MotionDatasetV2(self.opt, self.mean, self.std, self.split_file, self.w_vectorizer)
+            self.num_actions = 1 # dummy placeholder
+
+        assert len(self.m2m_dataset) > 1, 'You loaded an empty dataset, ' \
+                                          'it is probably because your data dir has only texts and no motions.\n' \
+                                          'To train and evaluate MDM you should get the FULL data as described ' \
+                                          'in the README file.'
+
+    def __getitem__(self, item):
+        return self.m2m_dataset.__getitem__(item)
+
+    def __len__(self):
+        return self.m2m_dataset.__len__()

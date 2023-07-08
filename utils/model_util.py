@@ -36,6 +36,10 @@ def get_model_args(args, data):
         data_rep = 'hml_vec'
         njoints = 263
         nfeats = 1
+    elif args.dataset == 'm2m':
+        data_rep = 'hml_vec'
+        njoints = 263
+        nfeats = 1
     elif args.dataset == 'kit':
         data_rep = 'hml_vec'
         njoints = 251

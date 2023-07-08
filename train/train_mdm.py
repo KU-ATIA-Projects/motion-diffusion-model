@@ -5,6 +5,8 @@ Train a diffusion model on images.
 
 import os
 import json
+import sys
+sys.path.append('/home/pjr726/motion-diffusion-model-origin')
 from utils.fixseed import fixseed
 from utils.parser_util import train_args
 from utils import dist_util

@@ -1,0 +1,20 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: mdm_train",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/train/train_mdm.py",
+            "args": [
+                "--save_dir", "/home/pjr726/motion-diffusion-model-origin/save/m2m_trans_enc_512_train",
+                "--dataset", "m2m"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}

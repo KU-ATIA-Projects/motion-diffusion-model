@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+motion_paired_data/*
+
+motion_paired_data_rec/*
+
+body_models/*
+motion_dataset/*
+save/*
+000021.npy
